@@ -1,0 +1,759 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bobby Arsanto Putro — GIS Analyst & Spatial Developer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<style>
+  :root {
+    --teal:       #0d6e56;
+    --teal-light: #e1f5ee;
+    --teal-mid:   #5dcaa5;
+    --teal-dark:  #084438;
+    --ink:        #0e1512;
+    --ink-2:      #2c3830;
+    --muted:      #647a72;
+    --muted-2:    #a8bab3;
+    --surface:    #f5f9f7;
+    --surface-2:  #eaf3ef;
+    --border:     rgba(13,110,86,0.12);
+    --border-2:   rgba(13,110,86,0.22);
+    --white:      #ffffff;
+    --mono:       'DM Mono', monospace;
+    --sans:       'DM Sans', sans-serif;
+    --radius:     10px;
+    --radius-lg:  16px;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body { font-family: var(--sans); background: var(--surface); color: var(--ink); line-height: 1.6; overflow-x: hidden; }
+  body::before {
+    content: ''; position: fixed; inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+    pointer-events: none; z-index: 0; opacity: 0.4;
+  }
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: var(--surface); }
+  ::-webkit-scrollbar-thumb { background: var(--teal-mid); border-radius: 3px; }
+
+  /* NAV */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    height: 56px; display: flex; align-items: center; justify-content: space-between;
+    padding: 0 2rem; background: rgba(245,249,247,0.88); backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+  }
+  .nav-logo { font-family: var(--mono); font-size: 13px; font-weight: 500; color: var(--teal); letter-spacing: 0.02em; text-decoration: none; }
+  .nav-links { display: flex; gap: 2rem; list-style: none; }
+  .nav-links a { font-size: 13px; color: var(--muted); text-decoration: none; letter-spacing: 0.01em; transition: color 0.2s; }
+  .nav-links a:hover { color: var(--teal); }
+  .nav-cta { font-family: var(--mono); font-size: 12px; font-weight: 500; padding: 7px 16px; background: var(--teal); color: var(--white); border: none; border-radius: var(--radius); cursor: pointer; text-decoration: none; transition: background 0.2s, transform 0.15s; letter-spacing: 0.02em; }
+  .nav-cta:hover { background: var(--teal-dark); transform: translateY(-1px); }
+
+  /* HERO */
+  .hero { min-height: 100vh; display: flex; flex-direction: column; justify-content: center; padding: 8rem 2rem 4rem; position: relative; overflow: hidden; }
+  .hero-grid-bg { position: absolute; inset: 0; z-index: 0; background-image: linear-gradient(var(--border) 1px, transparent 1px), linear-gradient(90deg, var(--border) 1px, transparent 1px); background-size: 48px 48px; mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black 30%, transparent 100%); }
+  .hero-orb { position: absolute; width: 560px; height: 560px; border-radius: 50%; background: radial-gradient(circle, rgba(93,202,165,0.18) 0%, transparent 70%); top: -100px; right: -100px; pointer-events: none; }
+  .hero-content { position: relative; z-index: 1; max-width: 760px; }
+  .hero-tag { display: inline-flex; align-items: center; gap: 6px; font-family: var(--mono); font-size: 11px; color: var(--teal); background: var(--teal-light); border: 1px solid rgba(13,110,86,0.2); padding: 4px 12px; border-radius: 99px; margin-bottom: 1.5rem; letter-spacing: 0.04em; }
+  .hero-tag::before { content: ''; width: 6px; height: 6px; background: var(--teal); border-radius: 50%; animation: pulse 2s ease-in-out infinite; }
+  @keyframes pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.4; transform: scale(0.8); } }
+  .hero h1 { font-size: clamp(2.4rem, 5vw, 3.6rem); font-weight: 300; line-height: 1.1; color: var(--ink); margin-bottom: 0.5rem; letter-spacing: -0.02em; }
+  .hero h1 strong { font-weight: 500; color: var(--teal); }
+  .hero-sub { font-size: 1.05rem; color: var(--muted); margin-bottom: 2rem; max-width: 520px; line-height: 1.7; font-weight: 300; }
+  .hero-stats { display: flex; gap: 2.5rem; margin-bottom: 2.5rem; }
+  .hstat-num { font-family: var(--mono); font-size: 1.8rem; font-weight: 500; color: var(--teal); display: block; line-height: 1; margin-bottom: 2px; }
+  .hstat-label { font-size: 11px; color: var(--muted); letter-spacing: 0.04em; text-transform: uppercase; }
+  .hero-btns { display: flex; gap: 12px; flex-wrap: wrap; }
+  .btn-primary { display: inline-flex; align-items: center; gap: 8px; font-family: var(--mono); font-size: 13px; font-weight: 500; padding: 10px 22px; background: var(--teal); color: var(--white); border: none; border-radius: var(--radius); cursor: pointer; text-decoration: none; transition: background 0.2s, transform 0.15s; letter-spacing: 0.02em; }
+  .btn-primary:hover { background: var(--teal-dark); transform: translateY(-1px); }
+  .btn-outline { display: inline-flex; align-items: center; gap: 8px; font-family: var(--mono); font-size: 13px; padding: 10px 22px; background: transparent; color: var(--teal); border: 1px solid var(--border-2); border-radius: var(--radius); cursor: pointer; text-decoration: none; transition: background 0.2s, border-color 0.2s, transform 0.15s; letter-spacing: 0.02em; }
+  .btn-outline:hover { background: var(--teal-light); border-color: var(--teal); transform: translateY(-1px); }
+
+  /* SECTIONS */
+  section { padding: 5rem 2rem; position: relative; z-index: 1; }
+  .section-header { display: flex; align-items: baseline; gap: 1rem; margin-bottom: 2.5rem; }
+  .section-num { font-family: var(--mono); font-size: 11px; color: var(--teal); opacity: 0.6; letter-spacing: 0.06em; }
+  .section-title { font-size: 1.5rem; font-weight: 400; color: var(--ink); letter-spacing: -0.01em; }
+  .section-line { flex: 1; height: 1px; background: var(--border); }
+
+  /* PROJECTS */
+  #projects { background: var(--white); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+  .projects-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; max-width: 1100px; }
+  .pcard { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); overflow: hidden; transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s; display: flex; flex-direction: column; }
+  .pcard:hover { border-color: var(--teal-mid); transform: translateY(-3px); box-shadow: 0 8px 32px rgba(13,110,86,0.1); }
+  .pcard-thumb { height: 160px; position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center; }
+  .thumb-teal   { background: linear-gradient(135deg, #c8ede3 0%, #e1f5ee 100%); }
+  .thumb-blue   { background: linear-gradient(135deg, #d0e8f9 0%, #e6f1fb 100%); }
+  .thumb-amber  { background: linear-gradient(135deg, #f5e4c2 0%, #faeeda 100%); }
+  .thumb-purple { background: linear-gradient(135deg, #dddcf9 0%, #eeedfe 100%); }
+  .pcard-thumb svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+  .pcard-type { position: absolute; top: 10px; left: 10px; font-family: var(--mono); font-size: 10px; padding: 3px 9px; border-radius: 99px; border: 1px solid rgba(0,0,0,0.1); background: rgba(255,255,255,0.85); color: var(--ink-2); letter-spacing: 0.04em; backdrop-filter: blur(4px); }
+  .pcard-body { padding: 1.1rem 1.25rem 1.25rem; flex: 1; display: flex; flex-direction: column; }
+  .pcard-body h3 { font-size: 15px; font-weight: 500; color: var(--ink); margin-bottom: 6px; line-height: 1.35; }
+  .pcard-body p { font-size: 13px; color: var(--muted); line-height: 1.65; margin-bottom: 14px; flex: 1; }
+  .pcard-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 14px; }
+  .ptag { font-family: var(--mono); font-size: 10px; padding: 3px 8px; border-radius: var(--radius); background: var(--surface-2); color: var(--teal-dark); border: 1px solid var(--border); letter-spacing: 0.02em; }
+  .pcard-btns { display: flex; gap: 8px; }
+  .pbtn { flex: 1; font-family: var(--mono); font-size: 11px; padding: 8px 10px; border-radius: var(--radius); border: 1px solid var(--border-2); background: var(--white); color: var(--ink-2); cursor: pointer; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 5px; transition: background 0.15s, border-color 0.15s; letter-spacing: 0.02em; }
+  .pbtn:hover { background: var(--surface-2); border-color: var(--teal-mid); }
+  .pbtn.green { background: var(--teal); color: var(--white); border-color: var(--teal); }
+  .pbtn.green:hover { background: var(--teal-dark); }
+
+  /* SKILLS */
+  #skills { background: var(--surface); }
+  .skills-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; max-width: 900px; }
+  .skill-group-title { font-family: var(--mono); font-size: 11px; color: var(--teal); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+  .skill-group-title::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+  .skill-pills { display: flex; flex-wrap: wrap; gap: 8px; }
+  .spill { font-size: 13px; padding: 6px 14px; border-radius: 99px; border: 1px solid var(--border); background: var(--white); color: var(--ink-2); transition: border-color 0.15s, background 0.15s, color 0.15s; }
+  .spill:hover { border-color: var(--teal); background: var(--teal-light); color: var(--teal-dark); }
+
+  /* ABOUT */
+  #about { background: var(--white); border-top: 1px solid var(--border); }
+  .about-layout { display: grid; grid-template-columns: 1fr 1.4fr; gap: 4rem; max-width: 900px; align-items: start; }
+  .about-avatar { width: 80px; height: 80px; border-radius: 50%; background: var(--teal-light); border: 2px solid rgba(13,110,86,0.2); display: flex; align-items: center; justify-content: center; font-family: var(--mono); font-size: 18px; font-weight: 500; color: var(--teal); margin-bottom: 1.25rem; }
+  .about-left h2 { font-size: 1.3rem; font-weight: 500; color: var(--ink); margin-bottom: 4px; letter-spacing: -0.01em; }
+  .about-role { font-family: var(--mono); font-size: 12px; color: var(--teal); margin-bottom: 1rem; letter-spacing: 0.02em; }
+  .about-left p { font-size: 13px; color: var(--muted); line-height: 1.75; margin-bottom: 1.25rem; }
+  .timeline { list-style: none; }
+  .tl-item { display: flex; gap: 1rem; padding-bottom: 1.5rem; position: relative; }
+  .tl-item::before { content: ''; position: absolute; left: 15px; top: 30px; width: 1px; bottom: 0; background: var(--border); }
+  .tl-item:last-child::before { display: none; }
+  .tl-dot { width: 30px; height: 30px; border-radius: 50%; background: var(--teal-light); border: 1px solid rgba(13,110,86,0.2); display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 2px; }
+  .tl-dot svg { width: 14px; height: 14px; stroke: var(--teal); fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+  .tl-text h4 { font-size: 13px; font-weight: 500; color: var(--ink); margin-bottom: 2px; line-height: 1.4; }
+  .tl-text p { font-size: 12px; color: var(--muted); line-height: 1.6; }
+  .tl-period { font-family: var(--mono); font-size: 10px; color: var(--teal); letter-spacing: 0.04em; margin-bottom: 4px; display: block; }
+  .availability-badge { display: inline-flex; align-items: center; gap: 7px; font-family: var(--mono); font-size: 11px; color: var(--teal); background: var(--teal-light); border: 1px solid rgba(13,110,86,0.2); padding: 6px 14px; border-radius: 99px; letter-spacing: 0.04em; }
+  .availability-badge::before { content: ''; width: 7px; height: 7px; background: var(--teal); border-radius: 50%; animation: pulse 2s ease-in-out infinite; }
+
+  /* CONTACT */
+  #contact { background: var(--surface); border-top: 1px solid var(--border); }
+  .contact-layout { display: grid; grid-template-columns: 1.2fr 1fr; gap: 4rem; max-width: 800px; align-items: start; }
+  .contact-left h2 { font-size: 1.8rem; font-weight: 300; color: var(--ink); line-height: 1.2; margin-bottom: 1rem; letter-spacing: -0.02em; }
+  .contact-left h2 strong { font-weight: 500; color: var(--teal); }
+  .contact-left p { font-size: 13px; color: var(--muted); line-height: 1.75; margin-bottom: 1.5rem; }
+  .contact-links { display: flex; flex-direction: column; gap: 10px; }
+  .clink { display: flex; align-items: center; gap: 12px; padding: 12px 14px; background: var(--white); border: 1px solid var(--border); border-radius: var(--radius); text-decoration: none; color: var(--ink-2); font-size: 13px; transition: border-color 0.15s, background 0.15s, transform 0.15s; }
+  .clink:hover { border-color: var(--teal); background: var(--teal-light); transform: translateX(4px); }
+  .clink-icon { width: 32px; height: 32px; border-radius: 8px; background: var(--teal-light); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .clink-icon svg { width: 16px; height: 16px; stroke: var(--teal); fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+  .clink-label { font-size: 11px; color: var(--muted); font-family: var(--mono); letter-spacing: 0.04em; }
+  .clink-value { font-size: 13px; color: var(--ink); }
+  .clink-arrow { color: var(--muted-2); font-size: 14px; transition: color 0.15s; margin-left: auto; }
+  .clink:hover .clink-arrow { color: var(--teal); }
+
+  /* FOOTER */
+  footer { background: var(--ink); padding: 1.5rem 2rem; display: flex; align-items: center; justify-content: space-between; position: relative; z-index: 1; }
+  footer p { font-family: var(--mono); font-size: 11px; color: rgba(255,255,255,0.3); letter-spacing: 0.04em; }
+  footer span { font-family: var(--mono); font-size: 11px; color: rgba(93,202,165,0.6); letter-spacing: 0.04em; }
+
+  /* PDF MODAL */
+  .pdf-overlay { display: none; position: fixed; inset: 0; z-index: 200; background: rgba(14,21,18,0.75); backdrop-filter: blur(4px); align-items: center; justify-content: center; padding: 2rem; }
+  .pdf-overlay.open { display: flex; }
+  .pdf-modal { background: var(--white); border-radius: var(--radius-lg); overflow: hidden; width: 100%; max-width: 720px; max-height: 90vh; display: flex; flex-direction: column; border: 1px solid var(--border-2); box-shadow: 0 24px 80px rgba(13,110,86,0.25); }
+  .pdf-modal-bar { padding: 12px 16px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; background: var(--surface); flex-shrink: 0; }
+  .pdf-modal-bar-left { display: flex; align-items: center; gap: 8px; }
+  .pdf-modal-bar-left span { font-family: var(--mono); font-size: 12px; color: var(--ink-2); letter-spacing: 0.02em; }
+  .pdf-modal-bar-right { display: flex; gap: 8px; align-items: center; }
+  .mbar-btn { font-family: var(--mono); font-size: 11px; padding: 6px 12px; border-radius: var(--radius); border: 1px solid var(--border); background: var(--white); color: var(--muted); cursor: pointer; display: flex; align-items: center; gap: 5px; transition: background 0.15s, color 0.15s; text-decoration: none; }
+  .mbar-btn:hover { background: var(--surface-2); color: var(--ink); }
+  .mbar-close { background: none; border: none; color: var(--muted); cursor: pointer; font-size: 18px; display: flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 6px; transition: background 0.15s, color 0.15s; }
+  .mbar-close:hover { background: #fee; color: #c00; }
+  .pdf-iframe-wrap { flex: 1; overflow: hidden; background: #444; min-height: 440px; display: flex; align-items: center; justify-content: center; }
+  .pdf-iframe-wrap iframe { width: 100%; height: 100%; min-height: 440px; border: none; }
+  .pdf-placeholder { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; padding: 3rem; text-align: center; }
+  .pdf-placeholder-icon { width: 56px; height: 56px; border-radius: 50%; background: var(--teal-light); display: flex; align-items: center; justify-content: center; }
+  .pdf-placeholder-icon svg { width: 26px; height: 26px; stroke: var(--teal); fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+  .pdf-placeholder h4 { font-family: var(--mono); font-size: 13px; color: rgba(255,255,255,0.7); }
+  .pdf-placeholder p { font-size: 12px; color: rgba(255,255,255,0.4); max-width: 280px; line-height: 1.6; }
+
+  /* MAP MODAL */
+  .map-overlay { display: none; position: fixed; inset: 0; z-index: 200; background: rgba(14,21,18,0.75); backdrop-filter: blur(4px); align-items: center; justify-content: center; padding: 2rem; }
+  .map-overlay.open { display: flex; }
+  .map-modal { background: var(--white); border-radius: var(--radius-lg); overflow: hidden; width: 100%; max-width: 860px; max-height: 90vh; display: flex; flex-direction: column; border: 1px solid var(--border-2); box-shadow: 0 24px 80px rgba(13,110,86,0.25); }
+  .map-toolbar { padding: 10px 14px; border-bottom: 1px solid var(--border); background: var(--surface); display: flex; align-items: center; gap: 10px; flex-wrap: wrap; flex-shrink: 0; }
+  .map-toolbar-left { display: flex; align-items: center; gap: 8px; flex: 1; min-width: 0; }
+  .map-toolbar-left span { font-family: var(--mono); font-size: 12px; color: var(--ink-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; letter-spacing: 0.02em; }
+  .layer-toggles { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
+  .layer-toggle { display: flex; align-items: center; gap: 5px; cursor: pointer; user-select: none; font-family: var(--mono); font-size: 11px; color: var(--ink-2); }
+  .layer-toggle input[type="checkbox"] { width: 13px; height: 13px; accent-color: var(--teal); cursor: pointer; margin: 0; }
+  .layer-swatch { width: 14px; height: 8px; border-radius: 2px; flex-shrink: 0; transition: opacity 0.3s; }
+  .layer-label { transition: opacity 0.3s; }
+  .map-toolbar-right { display: flex; gap: 6px; align-items: center; flex-shrink: 0; }
+  #leafletMap { height: 480px; width: 100%; z-index: 1; flex-shrink: 0; }
+  .map-statusbar { padding: 7px 14px; border-top: 1px solid var(--border); background: var(--surface); display: flex; align-items: center; justify-content: space-between; font-family: var(--mono); font-size: 10px; color: var(--muted); flex-shrink: 0; gap: 12px; }
+  .map-statusbar span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  /* Leaflet popup overrides */
+  .leaflet-popup-content-wrapper { border-radius: 8px !important; box-shadow: 0 4px 20px rgba(13,110,86,0.15) !important; border: 1px solid rgba(13,110,86,0.12) !important; font-family: 'DM Mono', monospace !important; }
+  .leaflet-popup-content { margin: 10px 14px !important; font-size: 11px !important; }
+  .leaflet-popup-tip { background: white !important; }
+  /* Leaflet legend custom control */
+  .map-legend { background: rgba(255,255,255,0.92); border: 1px solid rgba(13,110,86,0.12); border-radius: 8px; padding: 8px 12px; backdrop-filter: blur(4px); }
+  .map-legend-item { display: flex; align-items: center; gap: 7px; margin-bottom: 5px; font-family: 'DM Mono', monospace; font-size: 10px; color: #2c3830; white-space: nowrap; }
+  .map-legend-item:last-child { margin-bottom: 0; }
+  .map-legend-swatch { width: 16px; height: 9px; border-radius: 2px; flex-shrink: 0; }
+
+  /* ANIMATIONS */
+  .fade-up { opacity: 0; transform: translateY(24px); transition: opacity 0.6s ease, transform 0.6s ease; }
+  .fade-up.visible { opacity: 1; transform: translateY(0); }
+
+  /* RESPONSIVE */
+  @media (max-width: 768px) {
+    .nav-links { display: none; }
+    .hero-stats { gap: 1.5rem; }
+    .about-layout, .contact-layout, .skills-layout { grid-template-columns: 1fr; gap: 2rem; }
+    .projects-grid { grid-template-columns: 1fr; }
+    #leafletMap { height: 340px; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <a class="nav-logo" href="#">BAP.gis</a>
+  <ul class="nav-links">
+    <li><a href="#projects">Projects</a></li>
+    <li><a href="#skills">Skills</a></li>
+    <li><a href="#about">About</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+  <a href="#contact" class="nav-cta">Hire me →</a>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-grid-bg"></div>
+  <div class="hero-orb"></div>
+  <div class="hero-content">
+    <div class="hero-tag">Available for work</div>
+    <h1>Bobby Arsanto Putro<br><strong>GIS Analyst</strong> &amp; Spatial<br>Developer</h1>
+    <p class="hero-sub">Geospatial analyst and web application developer with experience at the Indonesian Ministry of Maritime Affairs and Fisheries. I turn satellite imagery, spatial data, and code into tools that support real maritime decisions.</p>
+    <div class="hero-stats">
+      <div><span class="hstat-num">6</span><span class="hstat-label">Months at KKP</span></div>
+      <div><span class="hstat-num">4</span><span class="hstat-label">SHP Projects</span></div>
+      <div><span class="hstat-num">2</span><span class="hstat-label">Web Apps Built</span></div>
+    </div>
+    <div class="hero-btns">
+      <a href="#projects" class="btn-primary">View my work ↓</a>
+      <a href="#contact" class="btn-outline">Get in touch</a>
+    </div>
+  </div>
+</section>
+
+<!-- PROJECTS -->
+<section id="projects">
+  <div class="section-header fade-up">
+    <span class="section-num">01</span>
+    <h2 class="section-title">Projects</h2>
+    <div class="section-line"></div>
+  </div>
+  <div class="projects-grid">
+
+    <!-- Ecosystem Mapping -->
+    <div class="pcard fade-up">
+      <div class="pcard-thumb thumb-teal">
+        <svg viewBox="0 0 340 160" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
+          <polyline points="0,100 40,78 80,90 120,64 160,72 200,52 240,60 280,40 340,46" stroke="#0d6e56" stroke-width="2.5" fill="none" opacity="0.7"/>
+          <polygon points="0,100 40,78 80,90 120,64 160,72 200,52 240,60 280,40 340,46 340,160 0,160" fill="#5dcaa5" opacity="0.2"/>
+          <circle cx="120" cy="64" r="5" fill="#0d6e56" opacity="0.6"/>
+          <circle cx="200" cy="52" r="5" fill="#0d6e56" opacity="0.6"/>
+          <circle cx="280" cy="40" r="5" fill="#0d6e56" opacity="0.6"/>
+        </svg>
+        <span class="pcard-type">SHP · GEE · Maps</span>
+      </div>
+      <div class="pcard-body">
+        <h3>Coastal Ecosystem Mapping — Jawa Tengah</h3>
+        <p>Produced SHP layers for mangrove, seagrass (lamun), and coral reef (terumbu karang) ecosystems across the Central Java coast using Google Earth Engine classification and manual digitization.</p>
+        <div class="pcard-tags">
+          <span class="ptag">Google Earth Engine</span>
+          <span class="ptag">QGIS</span>
+          <span class="ptag">Shapefile</span>
+          <span class="ptag">Sentinel-2</span>
+        </div>
+        <div class="pcard-btns">
+          <button class="pbtn" onclick="openMap('ecosystem')">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"/><line x1="9" y1="3" x2="9" y2="18"/><line x1="15" y1="6" x2="15" y2="21"/></svg>
+            View Map
+          </button>
+          <button class="pbtn" onclick="openPDF('Ecosystem_Mapping_Report.pdf','Coastal Ecosystem Mapping')">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            Report
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- CCD App -->
+    <div class="pcard fade-up">
+      <div class="pcard-thumb thumb-blue">
+        <svg viewBox="0 0 340 160" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
+          <polyline points="0,90 40,85 80,75 120,80 160,65 200,68 240,55 280,58 340,50" stroke="#1a6fcc" stroke-width="2" fill="none" stroke-dasharray="5,3" opacity="0.5"/>
+          <polyline points="0,110 40,100 80,95 120,98 160,85 200,88 240,72 280,75 340,68" stroke="#0d6e56" stroke-width="2.5" fill="none" opacity="0.8"/>
+          <polygon points="0,90 40,85 80,75 120,80 160,65 200,68 240,55 280,58 340,50 340,68 280,75 240,72 200,88 160,85 120,98 80,95 40,100 0,110" fill="#e24b4a" opacity="0.1"/>
+          <polygon points="0,110 40,100 80,95 120,98 160,85 200,88 240,72 280,75 340,68 340,160 0,160" fill="#5dcaa5" opacity="0.15"/>
+        </svg>
+        <span class="pcard-type">GEE App · Remote Sensing</span>
+      </div>
+      <div class="pcard-body">
+        <h3>Coastline Change Detector (CCD)</h3>
+        <p>Full GEE application for multi-temporal coastline change detection. Features NDWI/MNDWI extraction, erosion and accretion hotspot detection, multi-year comparison (5–10yr intervals), and GeoTIFF/Shapefile export with interactive UI panel.</p>
+        <div class="pcard-tags">
+          <span class="ptag">Google Earth Engine</span>
+          <span class="ptag">NDWI / MNDWI</span>
+          <span class="ptag">Landsat 4–9</span>
+          <span class="ptag">Sentinel-2</span>
+          <span class="ptag">JavaScript</span>
+        </div>
+        <div class="pcard-btns">
+          <button class="pbtn" onclick="openPDF('CCD_Report.pdf','Coastline Change Detector')">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            Report
+          </button>
+          <a href="https://bobbyarsantoputro.users.earthengine.app/view/coastline-change-detector-ccd-v1" target="_blank" rel="noopener noreferrer" class="pbtn green">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+            Open App ↗
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Accretion Analysis -->
+    <div class="pcard fade-up">
+      <div class="pcard-thumb thumb-teal">
+        <svg viewBox="0 0 340 160" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
+          <ellipse cx="170" cy="80" rx="130" ry="55" stroke="#0d6e56" stroke-width="1" fill="none" opacity="0.25"/>
+          <ellipse cx="170" cy="80" rx="90" ry="38" stroke="#0d6e56" stroke-width="1" fill="none" opacity="0.35"/>
+          <ellipse cx="170" cy="80" rx="55" ry="23" stroke="#0d6e56" stroke-width="1.5" fill="#5dcaa5" opacity="0.18"/>
+          <ellipse cx="170" cy="80" rx="26" ry="11" fill="#0d6e56" opacity="0.25"/>
+          <circle cx="90" cy="52" r="8" fill="#e24b4a" opacity="0.3" stroke="#e24b4a" stroke-width="1.2"/>
+          <circle cx="252" cy="55" r="7" fill="#5dcaa5" opacity="0.4" stroke="#0d6e56" stroke-width="1.2"/>
+        </svg>
+        <span class="pcard-type">SHP · Spatial Analysis</span>
+      </div>
+      <div class="pcard-body">
+        <h3>Coastal Accretion &amp; RTRWP Analysis</h3>
+        <p>Identified coastal accretion areas outside RTRWP zones across Central Java by overlaying multi-temporal coastline extraction with provincial spatial planning data. Directly supports land management decisions at the Ministry.</p>
+        <div class="pcard-tags">
+          <span class="ptag">GEE</span>
+          <span class="ptag">MNDWI</span>
+          <span class="ptag">QGIS</span>
+          <span class="ptag">Shapefile</span>
+          <span class="ptag">Spatial Overlay</span>
+        </div>
+        <div class="pcard-btns">
+          <button class="pbtn" onclick="openMap('accretion')">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"/><line x1="9" y1="3" x2="9" y2="18"/><line x1="15" y1="6" x2="15" y2="21"/></svg>
+            View Map
+          </button>
+          <button class="pbtn" onclick="openPDF('Accretion_RTRWP_Analysis.pdf','Coastal Accretion & RTRWP Analysis')">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            Report
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- KKPRL Dashboard -->
+    <div class="pcard fade-up">
+      <div class="pcard-thumb thumb-purple">
+        <svg viewBox="0 0 340 160" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
+          <rect x="10" y="10" width="320" height="140" rx="6" fill="rgba(255,255,255,0.3)" stroke="#7f77dd" stroke-width="0.8" opacity="0.5"/>
+          <rect x="20" y="20" width="88" height="55" rx="4" fill="white" opacity="0.6" stroke="#afa9ec" stroke-width="0.8"/>
+          <text x="28" y="38" font-size="8" fill="#3c3489" font-family="monospace">Total KKPRL</text>
+          <text x="28" y="58" font-size="18" fill="#534ab7" font-family="monospace" font-weight="500">1,284</text>
+          <rect x="116" y="20" width="88" height="55" rx="4" fill="white" opacity="0.6" stroke="#afa9ec" stroke-width="0.8"/>
+          <text x="124" y="38" font-size="8" fill="#3c3489" font-family="monospace">Terbit</text>
+          <text x="124" y="58" font-size="18" fill="#0d6e56" font-family="monospace" font-weight="500">876</text>
+          <rect x="212" y="20" width="88" height="55" rx="4" fill="white" opacity="0.6" stroke="#afa9ec" stroke-width="0.8"/>
+          <text x="220" y="38" font-size="8" fill="#3c3489" font-family="monospace">Pending</text>
+          <text x="220" y="58" font-size="18" fill="#e24b4a" font-family="monospace" font-weight="500">408</text>
+          <rect x="20" y="84" width="230" height="55" rx="4" fill="white" opacity="0.5" stroke="#afa9ec" stroke-width="0.8"/>
+          <polyline points="30,126 60,116 90,120 120,106 150,110 180,98 210,102 235,94" stroke="#534ab7" stroke-width="1.5" fill="none" opacity="0.8"/>
+          <polyline points="30,130 60,124 90,127 120,116 150,118 180,110 210,113 235,107" stroke="#0d6e56" stroke-width="1.5" fill="none" opacity="0.6" stroke-dasharray="3,2"/>
+          <rect x="258" y="84" width="72" height="55" rx="4" fill="white" opacity="0.5" stroke="#afa9ec" stroke-width="0.8"/>
+          <circle cx="294" cy="108" r="18" fill="none" stroke="#afa9ec" stroke-width="8" opacity="0.3"/>
+          <circle cx="294" cy="108" r="18" fill="none" stroke="#534ab7" stroke-width="8" stroke-dasharray="45 68" stroke-dashoffset="-5" opacity="0.8"/>
+          <circle cx="294" cy="108" r="18" fill="none" stroke="#0d6e56" stroke-width="8" stroke-dasharray="23 90" stroke-dashoffset="-50" opacity="0.8"/>
+        </svg>
+        <span class="pcard-type">Web App · Dashboard</span>
+      </div>
+      <div class="pcard-body">
+        <h3>KKPRL Monitoring Dashboard</h3>
+        <p>Full web dashboard for national KKPRL (marine spatial permit) monitoring. Built from scratch with HTML5/CSS3/Vanilla JS featuring Chart.js analytics, Leaflet.js map, GeoJSON processing pipeline, and cross-device responsive layout.</p>
+        <div class="pcard-tags">
+          <span class="ptag">HTML5 / CSS3</span>
+          <span class="ptag">JavaScript</span>
+          <span class="ptag">Leaflet.js</span>
+          <span class="ptag">Chart.js</span>
+          <span class="ptag">GeoJSON</span>
+        </div>
+        <div class="pcard-btns">
+          <button class="pbtn" onclick="openPDF('KKPRL_Dashboard_Report.pdf','KKPRL Monitoring Dashboard')">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            Report
+          </button>
+          <a href="https://bobarsa007.github.io/kkprl-dashboard/" target="_blank" rel="noopener noreferrer" class="pbtn green">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+            Open Dashboard ↗
+          </a>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- SKILLS -->
+<section id="skills">
+  <div class="section-header fade-up">
+    <span class="section-num">02</span>
+    <h2 class="section-title">Skills &amp; Tools</h2>
+    <div class="section-line"></div>
+  </div>
+  <div class="skills-layout">
+    <div class="skill-group fade-up">
+      <div class="skill-group-title">Remote Sensing &amp; GIS</div>
+      <div class="skill-pills">
+        <span class="spill">Google Earth Engine</span><span class="spill">QGIS</span><span class="spill">ArcGIS</span><span class="spill">Sentinel-2</span><span class="spill">Landsat 4–9</span><span class="spill">NDWI / MNDWI</span><span class="spill">NDVI / EVI</span><span class="spill">Field Survey</span><span class="spill">Shapefile (SHP)</span><span class="spill">GeoTIFF</span>
+      </div>
+    </div>
+    <div class="skill-group fade-up">
+      <div class="skill-group-title">Development</div>
+      <div class="skill-pills">
+        <span class="spill">JavaScript</span><span class="spill">Python</span><span class="spill">HTML5 / CSS3</span><span class="spill">Leaflet.js</span><span class="spill">Chart.js</span><span class="spill">GeoJSON</span><span class="spill">GeoPandas</span><span class="spill">PostGIS</span>
+      </div>
+    </div>
+    <div class="skill-group fade-up">
+      <div class="skill-group-title">Analysis</div>
+      <div class="skill-pills">
+        <span class="spill">Coastline Change Detection</span><span class="spill">Ecosystem Mapping</span><span class="spill">Spatial Overlay</span><span class="spill">Multi-temporal Analysis</span><span class="spill">Bathymetric Survey</span><span class="spill">Land Use Classification</span>
+      </div>
+    </div>
+    <div class="skill-group fade-up">
+      <div class="skill-group-title">Domain</div>
+      <div class="skill-pills">
+        <span class="spill">Maritime &amp; Fisheries</span><span class="spill">Coastal Management</span><span class="spill">Marine Spatial Planning</span><span class="spill">KKPRL Permitting</span><span class="spill">Mangrove Mapping</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section id="about">
+  <div class="section-header fade-up">
+    <span class="section-num">03</span>
+    <h2 class="section-title">About</h2>
+    <div class="section-line"></div>
+  </div>
+  <div class="about-layout">
+    <div class="about-left fade-up">
+      <div class="about-avatar">BAP</div>
+      <h2>Bobby Arsanto Putro</h2>
+      <div class="about-role">// GIS Analyst · Spatial Developer</div>
+      <p>I'm a geospatial analyst and spatial developer based in Semarang, Central Java. My work sits at the intersection of satellite remote sensing, GIS analysis, and web development — with a focus on maritime and coastal environments.</p>
+      <p>During my 6-month internship at the Indonesian Ministry of Maritime Affairs and Fisheries (KKP), I produced SHP datasets, built a multi-temporal coastline change detection app on Google Earth Engine, and developed a full national monitoring dashboard for KKPRL permits.</p>
+      <div class="availability-badge">Open to new roles</div>
+    </div>
+    <div class="about-right fade-up">
+      <ul class="timeline">
+        <li class="tl-item">
+          <div class="tl-dot"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div>
+          <div class="tl-text">
+            <span class="tl-period">Aug 2023 – Jan 2024</span>
+            <h4>Surveyor &amp; GIS Intern — Kementerian Kelautan dan Perikanan (KKP)</h4>
+            <p>Produced SHP layers for coastal ecosystems, built the Coastline Change Detector on GEE, developed the KKPRL national monitoring dashboard, and conducted spatial analysis for maritime zone management across Central Java.</p>
+          </div>
+        </li>
+        <li class="tl-item">
+          <div class="tl-dot"><svg viewBox="0 0 24 24"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg></div>
+          <div class="tl-text">
+            <span class="tl-period">2020 – 2024</span>
+            <h4>Bachelor of Engineering — Geodesy &amp; Geomatics</h4>
+            <p>Specialization in remote sensing, coastal mapping, and geospatial application development.</p>
+          </div>
+        </li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact">
+  <div class="section-header fade-up">
+    <span class="section-num">04</span>
+    <h2 class="section-title">Contact</h2>
+    <div class="section-line"></div>
+  </div>
+  <div class="contact-layout">
+    <div class="contact-left fade-up">
+      <h2>Let's work<br><strong>together.</strong></h2>
+      <p>I'm open to full-time roles, freelance projects, and collaborations in GIS analysis, spatial development, and maritime data work. Based in Semarang, open to remote.</p>
+    </div>
+    <div class="fade-up">
+      <div class="contact-links">
+        <a href="mailto:your@email.com" class="clink">
+          <div class="clink-icon"><svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></div>
+          <div><div class="clink-label">Email</div><div class="clink-value">your@email.com</div></div>
+          <span class="clink-arrow">→</span>
+        </a>
+        <a href="https://linkedin.com/in/YOUR_LINKEDIN" target="_blank" rel="noopener noreferrer" class="clink">
+          <div class="clink-icon"><svg viewBox="0 0 24 24"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg></div>
+          <div><div class="clink-label">LinkedIn</div><div class="clink-value">linkedin.com/in/bobby-arsanto</div></div>
+          <span class="clink-arrow">→</span>
+        </a>
+        <a href="https://github.com/YOUR_GITHUB" target="_blank" rel="noopener noreferrer" class="clink">
+          <div class="clink-icon"><svg viewBox="0 0 24 24"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg></div>
+          <div><div class="clink-label">GitHub</div><div class="clink-value">github.com/YOUR_USERNAME</div></div>
+          <span class="clink-arrow">→</span>
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <p>© 2024 Bobby Arsanto Putro</p>
+  <span>Built by hand · Semarang, Indonesia</span>
+</footer>
+
+<!-- PDF MODAL -->
+<div class="pdf-overlay" id="pdfOverlay" onclick="closePDFOnBg(event)">
+  <div class="pdf-modal">
+    <div class="pdf-modal-bar">
+      <div class="pdf-modal-bar-left">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#e24b4a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        <span id="pdfTitle">Report</span>
+      </div>
+      <div class="pdf-modal-bar-right">
+        <a id="pdfDownload" href="#" download class="mbar-btn">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Download
+        </a>
+        <button class="mbar-close" onclick="closePDF()">✕</button>
+      </div>
+    </div>
+    <div class="pdf-iframe-wrap" id="pdfContent">
+      <div class="pdf-placeholder">
+        <div class="pdf-placeholder-icon"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>
+        <h4 id="pdfPlaceholderTitle">Loading...</h4>
+        <p>Place your PDF file next to index.html and update the filename in the code.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MAP MODAL -->
+<div class="map-overlay" id="mapOverlay" onclick="closeMapOnBg(event)">
+  <div class="map-modal">
+    <div class="map-toolbar">
+      <div class="map-toolbar-left">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--teal)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"/><line x1="9" y1="3" x2="9" y2="18"/><line x1="15" y1="6" x2="15" y2="21"/></svg>
+        <span id="mapTitle">Map</span>
+      </div>
+      <div id="layerToggles" class="layer-toggles"></div>
+      <div class="map-toolbar-right">
+        <button class="mbar-close" onclick="closeMap()">✕</button>
+      </div>
+    </div>
+    <div id="leafletMap"></div>
+    <div class="map-statusbar">
+      <span id="mapCoords">Move cursor over map to see coordinates</span>
+      <span id="mapZoom">Zoom 8</span>
+    </div>
+  </div>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+  // ── FADE-IN ──
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry, i) => {
+      if (entry.isIntersecting) {
+        setTimeout(() => entry.target.classList.add('visible'), i * 80);
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.1 });
+  document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
+
+  // ── ACTIVE NAV ──
+  const sections = document.querySelectorAll('section[id]');
+  const navLinks = document.querySelectorAll('.nav-links a');
+  window.addEventListener('scroll', () => {
+    let current = '';
+    sections.forEach(s => { if (window.scrollY >= s.offsetTop - 80) current = s.id; });
+    navLinks.forEach(a => { a.style.color = a.getAttribute('href') === '#' + current ? 'var(--teal)' : ''; });
+  });
+
+  // ── PDF MODAL ──
+  function openPDF(filename, title) {
+    document.getElementById('pdfTitle').textContent = filename;
+    document.getElementById('pdfPlaceholderTitle').textContent = title;
+    document.getElementById('pdfDownload').href = filename;
+    document.getElementById('pdfContent').innerHTML =
+      `<iframe src="${filename}" width="100%" style="min-height:440px;border:none;"></iframe>`;
+    document.getElementById('pdfOverlay').classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+  function closePDF() {
+    document.getElementById('pdfOverlay').classList.remove('open');
+    document.body.style.overflow = '';
+    document.getElementById('pdfContent').innerHTML = '';
+  }
+  function closePDFOnBg(e) { if (e.target.id === 'pdfOverlay') closePDF(); }
+
+  // ── MAP MODAL ──
+  let mapInstance = null;
+  let loadedLayers = {};
+
+  // ── CONFIGURE YOUR GEOJSON FILES HERE ──
+  // Place your converted GeoJSON files in a geojson/ folder next to index.html
+  // Run convert_shp.py to generate these files from your SHP files
+  const MAP_CONFIGS = {
+    ecosystem: {
+      title: 'Coastal Ecosystem Mapping — Jawa Tengah',
+      center: [-6.8, 110.1],
+      zoom: 8,
+      layers: [
+        { id: 'mangrove',       file: 'geojson/mangrove.geojson',       label: 'Mangrove',          color: '#084438', fill: '#0d6e56', fillOpacity: 0.55 },
+        { id: 'lamun',          file: 'geojson/lamun.geojson',          label: 'Lamun (Seagrass)',  color: '#0d4e6a', fill: '#3a9fc0', fillOpacity: 0.55 },
+        { id: 'terumbu_karang', file: 'geojson/terumbu_karang.geojson', label: 'Terumbu Karang',    color: '#7a3d00', fill: '#e9a84c', fillOpacity: 0.55 }
+      ]
+    },
+    accretion: {
+      title: 'Coastal Accretion & RTRWP Analysis — Jawa Tengah',
+      center: [-7.0, 110.2],
+      zoom: 8,
+      layers: [
+        { id: 'rtrwp',     file: 'geojson/rtrwp.geojson',     label: 'RTRWP Boundary',           color: '#3c3489', fill: '#afa9ec', fillOpacity: 0.18 },
+        { id: 'accretion', file: 'geojson/accretion.geojson', label: 'Area Akresi (luar RTRWP)', color: '#7a1a1a', fill: '#e24b4a', fillOpacity: 0.55 }
+      ]
+    }
+  };
+
+  async function openMap(configKey) {
+    const config = MAP_CONFIGS[configKey];
+    document.getElementById('mapTitle').textContent = config.title;
+    buildLayerToggles(config.layers);
+    document.getElementById('mapOverlay').classList.add('open');
+    document.body.style.overflow = 'hidden';
+
+    await new Promise(r => setTimeout(r, 150));
+
+    if (mapInstance) { mapInstance.remove(); mapInstance = null; }
+    loadedLayers = {};
+
+    mapInstance = L.map('leafletMap', { center: config.center, zoom: config.zoom });
+
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+      attribution: '© <a href="https://openstreetmap.org/copyright">OpenStreetMap</a> © <a href="https://carto.com/">CARTO</a>',
+      maxZoom: 19, subdomains: 'abcd'
+    }).addTo(mapInstance);
+
+    L.control.scale({ position: 'bottomleft', imperial: false }).addTo(mapInstance);
+
+    mapInstance.on('mousemove', e => {
+      document.getElementById('mapCoords').textContent =
+        `${e.latlng.lat.toFixed(5)}°N, ${e.latlng.lng.toFixed(5)}°E`;
+    });
+    mapInstance.on('zoomend', () => {
+      document.getElementById('mapZoom').textContent = `Zoom ${mapInstance.getZoom()}`;
+    });
+
+    const bounds = [];
+    let loadedCount = 0;
+
+    for (const lyr of config.layers) {
+      try {
+        const res = await fetch(lyr.file);
+        if (!res.ok) throw new Error('not found');
+        const geojson = await res.json();
+
+        const layer = L.geoJSON(geojson, {
+          style: { color: lyr.color, fillColor: lyr.fill, fillOpacity: lyr.fillOpacity, weight: 1.5, opacity: 1 },
+          onEachFeature: (feat, l) => {
+            if (!feat.properties) return;
+            const rows = Object.entries(feat.properties)
+              .filter(([, v]) => v !== null && v !== '' && v !== undefined)
+              .slice(0, 8)
+              .map(([k, v]) => `<tr><td style="padding:2px 10px 2px 0;color:#647a72;">${k}</td><td style="font-weight:500;">${v}</td></tr>`)
+              .join('');
+            if (rows) l.bindPopup(`<div style="min-width:180px;"><div style="font-size:10px;font-weight:500;color:#0d6e56;margin-bottom:6px;padding-bottom:4px;border-bottom:1px solid #eaf3ef;">${lyr.label}</div><table style="font-size:11px;">${rows}</table></div>`);
+          }
+        }).addTo(mapInstance);
+
+        loadedLayers[lyr.id] = layer;
+        loadedCount++;
+        try { bounds.push(layer.getBounds()); } catch (e) {}
+
+        const sw = document.getElementById('sw-' + lyr.id);
+        if (sw) sw.style.opacity = '1';
+
+      } catch (err) {
+        loadedLayers[lyr.id] = null;
+        const sw = document.getElementById('sw-' + lyr.id);
+        if (sw) sw.style.opacity = '0.25';
+        const lbl = document.getElementById('lbl-' + lyr.id);
+        if (lbl) { lbl.style.opacity = '0.35'; lbl.style.textDecoration = 'line-through'; lbl.title = 'File not found: ' + lyr.file; }
+      }
+    }
+
+    // Add legend
+    const legend = L.control({ position: 'bottomright' });
+    legend.onAdd = () => {
+      const div = L.DomUtil.create('div', 'map-legend');
+      div.innerHTML = config.layers.map(l =>
+        `<div class="map-legend-item"><div class="map-legend-swatch" style="background:${l.fill};border:1.5px solid ${l.color};"></div>${l.label}</div>`
+      ).join('');
+      return div;
+    };
+    legend.addTo(mapInstance);
+
+    if (bounds.length > 0) {
+      try {
+        const allBounds = bounds.reduce((acc, b) => acc.extend(b), L.latLngBounds(bounds[0]));
+        mapInstance.fitBounds(allBounds, { padding: [28, 28] });
+      } catch (e) {}
+    }
+
+    if (loadedCount === 0) {
+      document.getElementById('mapCoords').textContent =
+        '⚠ No GeoJSON files found — run convert_shp.py then place files in geojson/ folder';
+    } else if (loadedCount < config.layers.length) {
+      document.getElementById('mapCoords').textContent =
+        `${loadedCount}/${config.layers.length} layers loaded — check geojson/ folder for missing files`;
+    }
+  }
+
+  function buildLayerToggles(layers) {
+    document.getElementById('layerToggles').innerHTML = layers.map(l => `
+      <label class="layer-toggle" title="${l.file}">
+        <input type="checkbox" checked onchange="toggleLayer('${l.id}', this.checked)">
+        <span class="layer-swatch" id="sw-${l.id}" style="background:${l.fill};border:1.5px solid ${l.color};opacity:0.3;"></span>
+        <span class="layer-label" id="lbl-${l.id}">${l.label}</span>
+      </label>
+    `).join('');
+  }
+
+  function toggleLayer(id, visible) {
+    if (!mapInstance || !loadedLayers[id]) return;
+    visible ? mapInstance.addLayer(loadedLayers[id]) : mapInstance.removeLayer(loadedLayers[id]);
+  }
+
+  function closeMap() {
+    document.getElementById('mapOverlay').classList.remove('open');
+    document.body.style.overflow = '';
+    if (mapInstance) { mapInstance.remove(); mapInstance = null; }
+    loadedLayers = {};
+  }
+
+  function closeMapOnBg(e) { if (e.target.id === 'mapOverlay') closeMap(); }
+</script>
+</body>
+</html>
