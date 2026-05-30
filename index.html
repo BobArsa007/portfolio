@@ -631,8 +631,8 @@
       center: [-7.0, 110.2],
       zoom: 8,
       layers: [
-        { id: 'rtrwp',     file: 'rtrwp.geojson',     label: 'RTRWP Boundary',           color: '#3c3489', fill: '#afa9ec', fillOpacity: 0.18 },
-        { id: 'accretion', file: 'accretion.geojson', label: 'Area Akresi (luar RTRWP)', color: '#7a1a1a', fill: '#e24b4a', fillOpacity: 0.55 }
+        { id: 'rtrwp',     file: 'rtrwp.geojson',     label: 'Garis Pantai RTRWP 2024',  color: '#f5e642', fill: '#f5e642', fillOpacity: 0, weight: 2.5, dash: '8,4' },
+        { id: 'accretion', file: 'accretion.geojson', label: 'Area Akresi (luar RTRWP)', color: '#ff4444', fill: '#ff6b6b', fillOpacity: 0.6, weight: 1.5, dash: null }
       ]
     }
   };
@@ -679,7 +679,7 @@
         const geojson = await res.json();
 
         const layer = L.geoJSON(geojson, {
-          style: { color: lyr.color, fillColor: lyr.fill, fillOpacity: lyr.fillOpacity, weight: 1.5, opacity: 1 },
+          style: { color: lyr.color, fillColor: lyr.fill, fillOpacity: lyr.fillOpacity, weight: lyr.weight || 1.5, opacity: 1, dashArray: lyr.dash || null },
           onEachFeature: (feat, l) => {
             if (!feat.properties) return;
             const rows = Object.entries(feat.properties)
