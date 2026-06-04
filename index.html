@@ -77,26 +77,61 @@ body {
 }
 
 /* ── DOWNLOAD CV (fixed top-right) ── */
-.dl-cv {
+.dl-cv-wrap {
   position: fixed;
   top: 0; right: 0;
   z-index: 999;
+}
+.dl-cv-btn {
   background: var(--black);
   color: var(--yellow);
   font-family: var(--disp);
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 700;
   letter-spacing: 3px;
   text-transform: uppercase;
-  text-decoration: none;
-  padding: 14px 20px 14px 22px;
+  padding: 16px 24px 16px 26px;
   border-bottom-left-radius: 18px;
-  transition: background .2s, color .2s;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
+  cursor: pointer;
+  border: none;
+  transition: background .2s, color .2s;
+  user-select: none;
 }
-.dl-cv:hover { background: var(--white); color: var(--black); }
+.dl-cv-btn:hover { background: #2a2a2a; }
+.dl-cv-arrow { font-size: 10px; opacity: 0.6; transition: transform 0.2s; }
+.dl-cv-wrap.open .dl-cv-arrow { transform: rotate(180deg); }
+
+.dl-cv-dropdown {
+  display: none;
+  flex-direction: column;
+  background: var(--black);
+  border-top: 1px solid rgba(255,255,255,0.1);
+  border-bottom-left-radius: 18px;
+  overflow: hidden;
+}
+.dl-cv-wrap.open .dl-cv-dropdown { display: flex; }
+
+.dl-cv-option {
+  color: rgba(255,255,255,0.75);
+  font-family: var(--disp);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  text-decoration: none;
+  padding: 13px 26px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  transition: background 0.15s, color 0.15s;
+  border-top: 1px solid rgba(255,255,255,0.06);
+}
+.dl-cv-option:first-child { border-top: none; }
+.dl-cv-option:hover { background: var(--yellow); color: var(--black); }
+.dl-cv-option .flag { font-size: 14px; }
 
 /* ── HERO NAME ── */
 .hero {
@@ -539,91 +574,87 @@ body {
 #keahlian { position: relative; }
 #kontak { position: relative; }
 
-/* project grid — pill cards */
+/* project grid — square cards */
 .pgrid-pill {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 20px;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
   padding: 0 8vw 80px;
-  justify-content: center;
 }
 
 .pcard-pill {
   background-color: #e0ddd5;
-  border-radius: 200px;
+  border-radius: 20px;
   overflow: hidden;
-  width: 220px;
-  flex: 1 1 200px;
-  max-width: 280px;
-  min-height: 55vh;
   display: flex;
   flex-direction: column;
   position: relative;
   transition: transform 0.25s, box-shadow 0.25s;
-  cursor: pointer;
+  cursor: default;
 }
-.pcard-pill:hover { transform: translateY(-8px); box-shadow: 0 20px 50px rgba(0,0,0,0.15); }
+.pcard-pill:hover { transform: translateY(-5px); box-shadow: 0 16px 40px rgba(0,0,0,0.13); }
 
 .pcard-img {
   width: 100%;
-  height: 55%;
+  aspect-ratio: 4 / 3;
   position: relative;
   overflow: hidden;
   flex-shrink: 0;
-  border-radius: 200px 200px 0 0;
+  border-radius: 0;
 }
-.pcard-img svg { width: 100%; height: 100%; }
+.pcard-img svg { width: 100%; height: 100%; display: block; }
 
 .pcard-body {
-  flex: 1;
-  padding: 18px 24px 28px;
+  padding: 20px 22px 24px;
   display: flex;
   flex-direction: column;
+  flex: 1;
 }
 
 .pcard-type {
   font-family: var(--disp);
-  font-size: 10px;
+  font-size: 9.5px;
   font-weight: 700;
-  letter-spacing: 0.12em;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: rgba(0,0,0,0.4);
-  margin-bottom: 6px;
+  color: rgba(0,0,0,0.38);
+  margin-bottom: 7px;
 }
 
 .pcard-title {
   font-family: var(--disp);
   font-size: 18px;
-  font-weight: 700;
+  font-weight: 900;
   color: var(--black);
-  line-height: 1.2;
-  margin-bottom: 8px;
-  letter-spacing: -0.3px;
+  line-height: 1.1;
+  margin-bottom: 10px;
+  letter-spacing: -0.02em;
 }
 
 .pcard-desc {
-  font-size: 11px;
-  color: rgba(0,0,0,0.55);
-  line-height: 1.7;
+  font-size: 11.5px;
+  color: rgba(0,0,0,0.52);
+  line-height: 1.75;
   font-weight: 300;
   font-family: var(--body);
   flex: 1;
-  margin-bottom: 12px;
+  margin-bottom: 18px;
 }
 
 .pcard-btns {
   display: flex;
-  gap: 6px;
+  gap: 8px;
   flex-wrap: wrap;
+  margin-top: auto;
 }
 
 .pcard-btn {
   font-family: var(--disp);
   font-size: 11px;
   font-weight: 700;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
-  padding: 7px 14px;
+  padding: 8px 16px;
   border-radius: 99px;
   border: 2px solid var(--black);
   background: transparent;
@@ -632,6 +663,7 @@ body {
   text-decoration: none;
   display: inline-flex; align-items: center; gap: 4px;
   transition: background 0.15s, color 0.15s;
+  white-space: nowrap;
 }
 .pcard-btn:hover { background: var(--black); color: var(--yellow); }
 .pcard-btn.primary { background: var(--black); color: var(--yellow); }
@@ -908,7 +940,8 @@ footer span { font-family: var(--mono); font-size: 10px; color: rgba(248,203,116
   .kontak-left { border-right: none; border-bottom: 2px solid rgba(255,255,255,0.07); }
   .skill-groups { grid-template-columns: 1fr; }
   .pgrid-pill { gap: 14px; }
-  .pcard-pill { min-height: 45vh; border-radius: 120px; }
+  .pgrid-pill { grid-template-columns: 1fr 1fr; gap: 12px; padding: 0 5vw 60px; }
+  .pcard-pill { max-width: 100%; border-radius: 16px; }
   .hero {
     grid-template-columns: 1fr;
     padding: 10vw 6vw 8vw;
@@ -935,7 +968,19 @@ footer span { font-family: var(--mono); font-size: 10px; color: rgba(248,203,116
 <body>
 
 <!-- FIXED DOWNLOAD CV -->
-<a href="CV_Bobby_Arsanto_Putro_EN.pdf" download class="dl-cv">↓ CV</a>
+<div class="dl-cv-wrap" id="cvWrap">
+  <button class="dl-cv-btn" onclick="toggleCV()">
+    ↓ Unduh CV <span class="dl-cv-arrow">▼</span>
+  </button>
+  <div class="dl-cv-dropdown">
+    <a href="CV_Bobby_Arsanto_Putro_EN.pdf" download class="dl-cv-option">
+      <span class="flag">🇬🇧</span> English
+    </a>
+    <a href="CV_Bobby_Arsanto_Putro_ID.pdf" download class="dl-cv-option">
+      <span class="flag">🇮🇩</span> Indonesia
+    </a>
+  </div>
+</div>
 
 <!-- ═══ HERO ═══ -->
 <section class="hero">
@@ -1103,8 +1148,7 @@ footer span { font-family: var(--mono); font-size: 10px; color: rgba(248,203,116
           <div class="pcard-title">Pemetaan Ekosistem Pesisir</div>
           <div class="pcard-desc">Mangrove, lamun, dan terumbu karang seluruh pesisir Jawa Tengah via Sentinel-2. Diserahkan ke tim KKP.</div>
           <div class="pcard-btns">
-            <button class="pcard-btn" onclick="openMap('ecosystem')">Peta</button>
-            <button class="pcard-btn primary" onclick="openPDF('Ecosystem_Mapping_Report.pdf','Pemetaan Ekosistem Pesisir')">Laporan</button>
+            <button class="pcard-btn primary" onclick="openMap('ecosystem')">Lihat Peta ↗</button>
           </div>
         </div>
       </div>
@@ -1131,7 +1175,6 @@ footer span { font-family: var(--mono); font-size: 10px; color: rgba(248,203,116
           <div class="pcard-title">Coastline Change Detector</div>
           <div class="pcard-desc">Pantau perubahan garis pantai Jawa Tengah 10+ tahun. Deteksi erosi & akresi otomatis.</div>
           <div class="pcard-btns">
-            <button class="pcard-btn" onclick="openPDF('CCD_Report.pdf','Coastline Change Detector')">Laporan</button>
             <a href="https://bobbyarsantoputro.users.earthengine.app/view/coastline-change-detector-ccd-v1" target="_blank" rel="noopener" class="pcard-btn primary">Buka ↗</a>
           </div>
         </div>
@@ -1158,8 +1201,7 @@ footer span { font-family: var(--mono); font-size: 10px; color: rgba(248,203,116
           <div class="pcard-title">Analisis Akresi & RTRWP</div>
           <div class="pcard-desc">518 area akresi di luar kawasan RTRWP — rekomendasi pemanfaatan lahan pesisir baru.</div>
           <div class="pcard-btns">
-            <button class="pcard-btn" onclick="openMap('accretion')">Peta</button>
-            <button class="pcard-btn primary" onclick="openPDF('Accretion_RTRWP_Analysis.pdf','Analisis Akresi & RTRWP')">Laporan</button>
+            <button class="pcard-btn primary" onclick="openMap('accretion')">Lihat Peta ↗</button>
           </div>
         </div>
       </div>
@@ -1191,7 +1233,6 @@ footer span { font-family: var(--mono); font-size: 10px; color: rgba(248,203,116
           <div class="pcard-title">Dashboard Monitoring KKPRL</div>
           <div class="pcard-desc">Monitoring 1.284+ izin pemanfaatan ruang laut nasional. Peta interaktif & grafik analitik.</div>
           <div class="pcard-btns">
-            <button class="pcard-btn" onclick="openPDF('KKPRL_Dashboard_Report.pdf','Dashboard Monitoring KKPRL')">Laporan</button>
             <a href="https://bobarsa007.github.io/kkprl-dashboard/" target="_blank" rel="noopener" class="pcard-btn primary">Buka ↗</a>
           </div>
         </div>
@@ -1408,6 +1449,15 @@ buildRow(row1items, document.getElementById('marqueeRow1'));
 buildRow(row2items, document.getElementById('marqueeRow2'));
 
 
+
+// ── CV dropdown ──
+function toggleCV() {
+  document.getElementById('cvWrap').classList.toggle('open');
+}
+document.addEventListener('click', e => {
+  const wrap = document.getElementById('cvWrap');
+  if (wrap && !wrap.contains(e.target)) wrap.classList.remove('open');
+});
 
 // ── Section toggle ──
 function toggleSec(id) {
