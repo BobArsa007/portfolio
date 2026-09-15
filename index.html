@@ -136,7 +136,7 @@ body { padding-top: 64px; }
   display: grid;
   grid-template-columns: 1.35fr 1fr;
   align-items: stretch;
-  min-height: calc(100vh - 64px);
+  height: 100%;
   border-bottom: 1px solid var(--line);
 }
 .hero-left {
@@ -221,10 +221,10 @@ body { padding-top: 64px; }
 }
 
 @media (max-width: 860px) {
-  .hero { grid-template-columns: 1fr; min-height: auto; }
-  .hero-right { height: auto; padding: 40px 32px 56px; border-left: none; border-top: 1px solid var(--line); order: -1; }
-  .hero-photo { max-width: 220px; }
-  .hero-left { padding: 6vh var(--gutter); }
+  .hero { grid-template-columns: 1fr; grid-template-rows: auto 1fr; height: 100%; }
+  .hero-right { height: auto; padding: 16px 24px; border-left: none; border-top: 1px solid var(--line); order: -1; flex-shrink: 0; }
+  .hero-photo { max-width: 130px; }
+  .hero-left { padding: 16px var(--gutter); gap: 10px; overflow: hidden; }
 }
 
 /* ══ PAGE-FLIP SYSTEM ══ */
@@ -233,15 +233,23 @@ body { padding-top: 64px; }
    the site feels like turning a leaf rather than a scroll jump. */
 #pageport {
   position: relative;
-  min-height: calc(100vh - 64px);
+  height: calc(100dvh - 64px);
   overflow: hidden;
 }
 .page {
   display: none;
   background: var(--paper);
   width: 100%;
+  height: 100%;
+  overflow: hidden;
 }
 .page.current { display: block; position: relative; }
+.page > section {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
 
 /* while animating, both outgoing + incoming pages are stacked absolutely
    so they overlap instead of pushing layout during the transition */
@@ -290,46 +298,45 @@ body { padding-top: 64px; }
 /* ══ ABOUT ══ */
 .about-inner {
   display: grid;
-  grid-template-columns: 340px 1fr;
-  border-bottom: 1px solid var(--line);
+  grid-template-columns: 300px 1fr;
+  height: 100%;
+  overflow: hidden;
 }
 
 .about-left-col {
-  position: sticky;
-  top: 64px;
-  align-self: start;
-  height: calc(100vh - 64px);
+  height: 100%;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  justify-content: center;
+  gap: clamp(20px, 5vh, 56px);
   border-right: 1px solid var(--line);
-  padding: 44px 36px;
-  overflow-y: auto;
+  padding: clamp(14px, 2.5vh, 28px) 30px;
+  overflow: hidden;
 }
 
 .about-eyebrow {
   font-family: var(--mono);
-  font-size: 10.5px;
+  font-size: clamp(10px, 1vh, 12px);
   letter-spacing: 0.05em;
   color: var(--ink-40);
-  margin-bottom: 16px;
+  margin-bottom: clamp(8px, 1vh, 12px);
 }
 
 .about-name {
   font-family: var(--serif);
-  font-size: clamp(1.7rem, 2.3vw, 2.15rem);
+  font-size: clamp(1.3rem, 4vh, 2.1rem);
   font-weight: 500;
   line-height: 1.08;
   letter-spacing: -0.01em;
-  margin-bottom: 14px;
+  margin-bottom: clamp(8px, 1.2vh, 14px);
 }
 
 .about-role {
   font-family: var(--mono);
-  font-size: 12px;
+  font-size: clamp(11px, 1.2vh, 13px);
   color: var(--ink-60);
-  line-height: 1.8;
-  margin-bottom: 30px;
+  line-height: 1.7;
+  margin-bottom: clamp(14px, 2vh, 24px);
 }
 
 .about-stats {
@@ -337,10 +344,9 @@ body { padding-top: 64px; }
   grid-auto-flow: column;
   grid-auto-columns: 1fr;
   border: 1px solid var(--line);
-  margin-bottom: 30px;
 }
 .about-stat {
-  padding: 14px 20px;
+  padding: clamp(8px, 1.4vh, 16px) 16px;
   display: flex;
   flex-direction: column;
   gap: 3px;
@@ -349,27 +355,27 @@ body { padding-top: 64px; }
 .about-stat:first-child { border-left: none; }
 .about-stat-num {
   font-family: var(--serif);
-  font-size: 21px;
+  font-size: clamp(17px, 2.4vh, 23px);
   font-weight: 500;
 }
 .about-stat-lbl {
   font-family: var(--mono);
-  font-size: 9px;
+  font-size: 8.5px;
   letter-spacing: 0.03em;
   color: var(--ink-40);
 }
 
-.about-meta { display: flex; flex-direction: column; margin-bottom: 20px; }
+.about-meta { display: flex; flex-direction: column; }
 .about-meta-row {
   display: flex;
   align-items: center;
-  gap: 11px;
-  padding: 10px 0;
+  gap: 10px;
+  padding: clamp(6px, 1vh, 11px) 0;
   border-bottom: 1px solid var(--line);
 }
 .about-meta-row:last-child { border-bottom: none; }
 .about-meta-row svg {
-  width: 13px; height: 13px;
+  width: 12px; height: 12px;
   stroke: var(--ink-40);
   fill: none;
   stroke-width: 1.6;
@@ -379,45 +385,60 @@ body { padding-top: 64px; }
 }
 .about-meta-text {
   font-family: var(--mono);
-  font-size: 10.5px;
+  font-size: clamp(9.5px, 1vh, 11px);
   color: var(--ink-60);
   letter-spacing: 0.01em;
-  line-height: 1.5;
+  line-height: 1.4;
 }
 
-.about-right-col { padding: 44px clamp(24px, 4vw, 56px); }
+.about-right-col {
+  height: 100%;
+  padding: clamp(14px, 2.5vh, 28px) clamp(20px, 3vw, 44px);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: clamp(16px, 3.5vh, 32px);
+}
 
-.about-bio-block { margin-bottom: 40px; max-width: 62ch; }
+.about-bio-block { max-width: 66ch; flex-shrink: 0; }
 .tl-head {
   font-family: var(--mono);
-  font-size: 11px;
+  font-size: clamp(10px, 1vh, 12px);
   letter-spacing: 0.04em;
   color: var(--ink-40);
-  margin-bottom: 14px;
+  margin-bottom: clamp(8px, 1.2vh, 12px);
 }
 .about-bio {
   font-family: var(--serif);
-  font-size: clamp(16px, 1.5vw, 19px);
+  font-size: clamp(14px, 2.2vh, 18px);
   font-weight: 400;
-  line-height: 1.55;
+  line-height: 1.5;
   color: var(--ink);
-  margin-bottom: 16px;
+  margin-bottom: 6px;
 }
 .about-bio:last-child { margin-bottom: 0; }
 
+.tl-cols {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0 32px;
+}
+.tl-col { display: flex; flex-direction: column; min-height: 0; }
+
 .tl-list { list-style: none; }
 .tl-list li.tl-head {
-  margin-top: 34px;
+  margin-top: clamp(12px, 2vh, 20px);
   margin-bottom: 4px;
-  padding-top: 20px;
+  padding-top: clamp(8px, 1.4vh, 14px);
   border-top: 1px solid var(--line);
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
 }
 .tl-list li.tl-head::before {
   content: '';
-  width: 14px;
+  width: 12px;
   height: 1px;
   background: var(--ink-25);
   flex-shrink: 0;
@@ -426,23 +447,21 @@ body { padding-top: 64px; }
 
 .tl-item {
   display: flex;
-  gap: 16px;
-  padding: 18px 0;
+  gap: 12px;
+  padding: clamp(8px, 1.4vh, 14px) 0;
   border-bottom: 1px solid var(--line);
-  transition: padding-left 0.18s ease;
 }
 .tl-item:last-child { border-bottom: none; }
-.tl-item:hover { padding-left: 6px; }
 .tl-dot {
-  width: 28px; height: 28px;
+  width: 22px; height: 22px;
   border: 1px solid var(--ink-12);
   border-radius: 50%;
   display: flex; align-items: center; justify-content: center;
   flex-shrink: 0;
-  margin-top: 2px;
+  margin-top: 1px;
 }
 .tl-dot svg {
-  width: 13px; height: 13px;
+  width: 11px; height: 11px;
   stroke: var(--ink-60);
   fill: none;
   stroke-width: 1.6;
@@ -453,185 +472,235 @@ body { padding-top: 64px; }
 .tl-period {
   display: block;
   font-family: var(--mono);
-  font-size: 10.5px;
+  font-size: 9.5px;
   color: var(--ink-40);
   letter-spacing: 0.02em;
-  margin-bottom: 6px;
+  margin-bottom: 2px;
 }
 .tl-body h4 {
   font-family: var(--serif);
-  font-size: 16px;
+  font-size: clamp(12.5px, 1.7vh, 15px);
   font-weight: 500;
-  line-height: 1.35;
-  margin-bottom: 6px;
+  line-height: 1.3;
+  margin-bottom: 3px;
   letter-spacing: -0.005em;
 }
 .tl-body p {
   font-family: var(--mono);
-  font-size: 12px;
+  font-size: clamp(10px, 1.15vh, 11.5px);
   color: var(--ink-60);
-  line-height: 1.65;
+  line-height: 1.5;
   max-width: 64ch;
 }
 
 @media (max-width: 860px) {
-  .about-inner { grid-template-columns: 1fr; }
-  .about-left-col { position: static; height: auto; border-right: none; border-bottom: 1px solid var(--line); }
+  .about-inner { grid-template-columns: 1fr; grid-template-rows: auto 1fr; }
+  .about-left-col { height: auto; justify-content: flex-start; gap: 10px; border-right: none; border-bottom: 1px solid var(--line); padding: 10px 16px; }
+  .about-right-col { padding: 10px 16px; justify-content: flex-start; gap: 10px; }
+  .about-stats { display: none; }
+  .about-meta-row:nth-child(3), .about-meta-row:nth-child(4) { display: none; }
+  .tl-cols { grid-template-columns: 1fr; gap: 0; overflow: hidden; }
+  .tl-col:last-child { display: none; }
 }
 
 /* ══ PROJECTS ══ */
+#proyek { height: 100%; display: flex; flex-direction: column; overflow: hidden; }
 .proyek-header {
   display: flex;
   align-items: baseline;
   justify-content: space-between;
-  padding: 40px var(--gutter) 24px;
+  padding: clamp(10px, 2vh, 20px) var(--gutter) 10px;
   border-bottom: 1px solid var(--line);
+  flex-shrink: 0;
 }
 .proyek-h-text {
   font-family: var(--serif);
-  font-size: clamp(22px, 2.4vw, 30px);
+  font-size: clamp(18px, 2vw, 24px);
   font-weight: 500;
 }
 .proyek-h-sub {
   font-family: var(--mono);
-  font-size: 11px;
+  font-size: 10px;
   color: var(--ink-40);
   letter-spacing: 0.03em;
 }
 
 .pgrid {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-auto-rows: 1fr;
+  gap: 1px;
+  background: var(--line);
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
 }
 
 .pcard {
-  display: grid;
-  grid-template-columns: 220px 1fr;
-  gap: clamp(24px, 3vw, 48px);
-  padding: clamp(28px, 3.5vw, 44px) var(--gutter);
-  border-bottom: 1px solid var(--line);
-  align-items: center;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: clamp(12px, 2vh, 22px) clamp(14px, 1.6vw, 24px);
+  background: var(--paper);
+  min-height: 0;
+  overflow: hidden;
 }
 .pcard:hover { background: var(--paper-off); }
 
 .pcard-img {
-  aspect-ratio: 4/3;
+  aspect-ratio: 16/9;
   border: 1px solid var(--line);
   background: var(--paper-off);
   overflow: hidden;
+  flex-shrink: 0;
 }
 .pcard-img svg { width: 100%; height: 100%; display: block; }
 
-.pcard-body { min-width: 0; }
+.pcard-body { min-width: 0; min-height: 0; display: flex; flex-direction: column; overflow: hidden; }
 .pcard-type {
   font-family: var(--mono);
-  font-size: 10.5px;
+  font-size: 9px;
   letter-spacing: 0.03em;
   color: var(--ink-40);
-  margin-bottom: 10px;
+  margin-bottom: 6px;
 }
 .pcard-title {
   font-family: var(--serif);
-  font-size: clamp(19px, 2vw, 25px);
+  font-size: clamp(14px, 1.3vw, 17px);
   font-weight: 500;
   letter-spacing: -0.01em;
-  margin-bottom: 10px;
+  line-height: 1.2;
+  margin-bottom: 6px;
 }
 .pcard-desc {
   font-family: var(--mono);
-  font-size: 12.5px;
+  font-size: 10.5px;
   color: var(--ink-60);
-  line-height: 1.7;
-  max-width: 58ch;
-  margin-bottom: 18px;
+  line-height: 1.5;
+  margin-bottom: 10px;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
 }
+
+.pcard-more { background: var(--paper-off); }
+.pcard-more-body { justify-content: center; height: 100%; }
+.pcard-more .pcard-title { color: var(--ink-60); }
 .pcard-btn {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
   font-family: var(--mono);
-  font-size: 12px;
+  font-size: 10.5px;
   color: var(--ink);
   text-decoration: none;
   border: 1px solid var(--ink-12);
-  padding: 9px 16px;
+  padding: 6px 12px;
   cursor: pointer;
   background: transparent;
   transition: background 0.15s, color 0.15s;
+  align-self: flex-start;
+  margin-top: auto;
 }
 .pcard-btn:hover { background: var(--ink); color: var(--paper); }
 
-@media (max-width: 720px) {
-  .pcard { grid-template-columns: 1fr; }
-  .pcard-img { max-width: 260px; }
+@media (max-width: 860px) {
+  .pgrid { grid-template-columns: 1fr 1fr; overflow-y: hidden; }
+  .pcard-desc { -webkit-line-clamp: 2; }
+}
+
+@media (max-width: 640px) {
+  .pgrid { grid-template-columns: 1fr 1fr; grid-auto-rows: 1fr; gap: 1px; }
+  .pcard { padding: 8px 10px; gap: 5px; }
+  .pcard-img { display: none; }
+  .pcard-type { font-size: 7.5px; margin-bottom: 3px; }
+  .pcard-title { font-size: 11.5px; margin-bottom: 3px; line-height: 1.15; }
+  .pcard-desc { -webkit-line-clamp: 2; margin-bottom: 6px; font-size: 9px; line-height: 1.35; }
+  .pcard-btn { font-size: 9px; padding: 4px 8px; }
+  .pcard-more-body { align-items: flex-start; text-align: left; }
 }
 
 /* ══ SKILLS ══ */
-.keahlian-inner { padding: 44px var(--gutter) 56px; }
+#keahlian { height: 100%; display: flex; flex-direction: column; overflow: hidden; }
+.keahlian-inner {
+  padding: clamp(16px, 5vh, 64px) var(--gutter);
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  overflow: hidden;
+}
 .keahlian-title {
   font-family: var(--serif);
-  font-size: clamp(22px, 2.4vw, 30px);
+  font-size: clamp(20px, 3.2vw, 36px);
   font-weight: 500;
-  margin-bottom: 36px;
+  margin-bottom: clamp(14px, 4vh, 40px);
+  flex-shrink: 0;
 }
-.skill-groups { display: flex; flex-direction: column; gap: 26px; }
+.skill-groups { display: flex; flex-direction: column; gap: clamp(8px, 3vh, 28px); }
 .sg-row {
   display: grid;
   grid-template-columns: 200px 1fr;
   gap: 20px;
-  padding: 20px 0;
+  padding: clamp(10px, 2.6vh, 22px) 0;
   border-top: 1px solid var(--line);
 }
 .skill-groups > .sg-row:first-child { border-top: none; padding-top: 0; }
 .sg-label {
   font-family: var(--mono);
-  font-size: 11px;
+  font-size: clamp(11px, 1vw, 13px);
   color: var(--ink-40);
   letter-spacing: 0.03em;
   padding-top: 2px;
 }
-.pills { display: flex; flex-wrap: wrap; gap: 8px 10px; }
+.pills { display: flex; flex-wrap: wrap; gap: clamp(6px, 0.8vw, 10px) clamp(8px, 1vw, 12px); }
 .pill {
   font-family: var(--mono);
-  font-size: 12px;
+  font-size: clamp(11px, 1vw, 13px);
   color: var(--ink);
   border: 1px solid var(--ink-12);
-  padding: 6px 13px;
+  padding: clamp(5px, 0.8vh, 8px) clamp(11px, 1.2vw, 16px);
 }
 
 @media (max-width: 640px) {
-  .sg-row { grid-template-columns: 1fr; gap: 8px; }
+  .sg-row { grid-template-columns: 1fr; gap: 4px; padding: 6px 0; }
+  .pill { font-size: 10px; padding: 4px 9px; }
 }
 
 /* ══ CONTACT ══ */
+#kontak { height: 100%; display: flex; flex-direction: column; overflow: hidden; }
 .kontak-inner {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: clamp(30px, 5vw, 60px);
-  padding: clamp(40px, 5vw, 64px) var(--gutter) clamp(56px, 6vw, 80px);
+  gap: clamp(20px, 5vw, 70px);
+  padding: clamp(16px, 4vh, 40px) var(--gutter);
+  height: 100%;
+  align-content: center;
+  overflow: hidden;
 }
 .kontak-h {
   font-family: var(--serif);
-  font-size: clamp(30px, 4vw, 48px);
+  font-size: clamp(24px, 5.2vh, 52px);
   font-weight: 500;
   line-height: 1.08;
   letter-spacing: -0.015em;
-  margin-bottom: 18px;
+  margin-bottom: clamp(12px, 2.4vh, 22px);
 }
 .kontak-h em { font-style: italic; font-weight: 400; color: var(--ink-40); }
 .kontak-sub {
   font-family: var(--mono);
-  font-size: 13px;
+  font-size: clamp(12px, 1.4vh, 15px);
   color: var(--ink-60);
-  line-height: 1.75;
+  line-height: 1.7;
   max-width: 46ch;
 }
-.kontak-right { display: flex; flex-direction: column; }
+.kontak-right { display: flex; flex-direction: column; justify-content: center; }
 .clink {
   display: flex;
   align-items: center;
   gap: 14px;
-  padding: 16px 0;
+  padding: clamp(10px, 2.2vh, 20px) 0;
   border-bottom: 1px solid var(--line);
   text-decoration: none;
   color: var(--ink);
@@ -640,7 +709,7 @@ body { padding-top: 64px; }
 .clink:first-child { padding-top: 0; }
 .clink:hover { gap: 18px; }
 .clink-icon {
-  width: 30px; height: 30px;
+  width: clamp(26px, 3.4vh, 34px); height: clamp(26px, 3.4vh, 34px);
   border: 1px solid var(--ink-12);
   border-radius: 50%;
   display: flex; align-items: center; justify-content: center;
@@ -648,11 +717,11 @@ body { padding-top: 64px; }
 }
 .clink-icon svg { width: 13px; height: 13px; stroke: var(--ink-60); fill: none; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
 .clink-lbl { font-family: var(--mono); font-size: 9.5px; color: var(--ink-40); letter-spacing: 0.03em; margin-bottom: 3px; }
-.clink-val { font-family: var(--serif); font-size: 15px; font-weight: 500; }
+.clink-val { font-family: var(--serif); font-size: clamp(13.5px, 1.9vh, 17px); font-weight: 500; }
 .clink-arr { margin-left: auto; font-family: var(--mono); color: var(--ink-25); transition: transform 0.15s; }
 .clink:hover .clink-arr { transform: translateX(3px); color: var(--ink); }
 
-.cv-row { display: flex; align-items: center; justify-content: space-between; padding-top: 22px; gap: 16px; flex-wrap: wrap; }
+.cv-row { display: flex; align-items: center; justify-content: space-between; padding-top: clamp(14px, 2.6vh, 24px); gap: 16px; flex-wrap: wrap; }
 .cv-row-label { font-family: var(--mono); font-size: 11px; color: var(--ink-40); letter-spacing: 0.03em; }
 .cv-btns { display: flex; gap: 10px; }
 .cv-btn {
@@ -667,7 +736,9 @@ body { padding-top: 64px; }
 .cv-btn:hover { background: var(--ink); color: var(--paper); }
 
 @media (max-width: 720px) {
-  .kontak-inner { grid-template-columns: 1fr; }
+  .kontak-inner { grid-template-columns: 1fr; gap: 10px; padding: 10px 16px; align-content: center; }
+  .kontak-sub { display: none; }
+  .clink { padding: 6px 0; }
 }
 
 /* ══ MODALS ══ */
@@ -944,6 +1015,16 @@ body { padding-top: 64px; }
           </div>
         </div>
 
+        <!-- More on GitHub -->
+        <div class="pcard pcard-more">
+          <div class="pcard-body pcard-more-body">
+            <div class="pcard-type">SELENGKAPNYA</div>
+            <div class="pcard-title">Lihat Semua Proyek</div>
+            <div class="pcard-desc">Repositori lengkap &amp; proyek lain ada di GitHub saya.</div>
+            <a href="https://github.com/BobArsa007" target="_blank" rel="noopener" class="pcard-btn">GitHub ↗</a>
+          </div>
+        </div>
+
       </div>
     </section>
   </div>
@@ -997,19 +1078,20 @@ body { padding-top: 64px; }
 
           <div class="about-bio-block">
             <div class="tl-head">Tentang Saya</div>
-            <p class="about-bio">Lulusan S1 Geografi UNNES dengan spesialisasi Sistem Informasi Geografis (SIG) dan penginderaan jauh. Berpengalaman dalam pengolahan citra satelit, pemetaan tematik, survei infrastruktur lapangan, serta pengembangan aplikasi dan visualisasi data spasial berbasis web.</p>
-            <p class="about-bio">Menguasai ArcGIS, QGIS, dan Google Earth Engine untuk berbagai kebutuhan analisis spasial — mulai dari pemetaan lingkungan, perencanaan tata ruang, hingga inventarisasi aset. Memiliki pemahaman pada perangkat subsurface termasuk Petrel dan Kingdom, serta pengembangan web fullstack dengan HTML5, CSS3, JavaScript, dan Node.js.</p>
+            <p class="about-bio">Lulusan S1 Geografi UNNES, spesialisasi SIG &amp; penginderaan jauh. Berpengalaman mengolah citra satelit, survei lapangan, dan membangun aplikasi WebGIS — dari ArcGIS/QGIS/GEE hingga JavaScript fullstack.</p>
           </div>
 
+          <div class="tl-cols">
+          <div class="tl-col">
           <ul class="tl-list">
 
             <li class="tl-head">Pendidikan</li>
             <li class="tl-item">
               <div class="tl-dot"><svg viewBox="0 0 24 24"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg></div>
               <div class="tl-body">
-                <span class="tl-period">Ags 2019 – Okt 2025</span>
-                <h4>S1 Geografi, IPK 3,50 — Universitas Negeri Semarang (UNNES)</h4>
-                <p>Spesialisasi penginderaan jauh, analisis SIG, pemetaan tematik, dan pengembangan aplikasi geospasial.</p>
+                <span class="tl-period">2019 – 2025</span>
+                <h4>S1 Geografi, IPK 3,50 — UNNES</h4>
+                <p>Penginderaan jauh, analisis SIG, pengembangan aplikasi geospasial.</p>
               </div>
             </li>
 
@@ -1017,48 +1099,44 @@ body { padding-top: 64px; }
             <li class="tl-item">
               <div class="tl-dot"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div>
               <div class="tl-body">
-                <span class="tl-period">Nov 2025 – Mei 2026 · MagangHub Kemnaker Batch 2</span>
-                <h4>Surveyor &amp; Pengembang GIS — Kementerian Kelautan dan Perikanan (KKP)</h4>
-                <p>Pemetaan ekosistem pesisir (mangrove, lamun, terumbu karang) Jawa Tengah via GEE &amp; Sentinel-2/Landsat. Membangun Coastline Change Detector multi-temporal berbasis NDWI/MNDWI, serta dashboard KKPRL interaktif dengan Leaflet.js &amp; Chart.js.</p>
+                <span class="tl-period">Nov 2025 – Mei 2026 · KKP</span>
+                <h4>Surveyor &amp; Pengembang GIS</h4>
+                <p>Pemetaan ekosistem pesisir via GEE. Membangun Coastline Change Detector &amp; dashboard KKPRL.</p>
               </div>
             </li>
             <li class="tl-item">
               <div class="tl-dot"><svg viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg></div>
               <div class="tl-body">
-                <span class="tl-period">Mar 2025 – Mei 2025</span>
-                <h4>Surveyor — CV Mitra Muda Rekayasa, Semarang</h4>
-                <p>Survei lapangan 200+ titik jalan di Kab. Sukoharjo — penilaian kondisi PJU &amp; marka jalan. Digitasi GPS, produksi peta akhir di QGIS &amp; ArcGIS, validasi akurasi basis data spasial.</p>
+                <span class="tl-period">Mar – Mei 2025</span>
+                <h4>Surveyor — CV Mitra Muda Rekayasa</h4>
+                <p>Survei 200+ titik jalan Kab. Sukoharjo, digitasi GPS &amp; produksi peta di QGIS/ArcGIS.</p>
               </div>
             </li>
-            <li class="tl-item">
-              <div class="tl-dot"><svg viewBox="0 0 24 24"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg></div>
-              <div class="tl-body">
-                <span class="tl-period">Feb 2023 – Jun 2023 · MSIB Dicoding x Kampus Merdeka Batch 4</span>
-                <h4>Peserta Pelatihan Pengembangan Web — Dicoding Indonesia, Bandung</h4>
-                <p>Pengembangan antarmuka responsif (HTML5/CSS3/JS ES6+), RESTful API dengan Node.js &amp; Express.js, dan alur Git/GitHub agile.</p>
-              </div>
-            </li>
+          </ul>
+          </div>
+          <div class="tl-col">
+          <ul class="tl-list">
 
             <li class="tl-head">Keahlian</li>
             <li class="tl-item">
               <div class="tl-dot"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/></svg></div>
               <div class="tl-body">
                 <span class="tl-period">SIG &amp; Penginderaan Jauh</span>
-                <h4>ArcGIS · QGIS · Google Earth Engine · Google Earth · GPS Handheld</h4>
+                <h4>ArcGIS · QGIS · Google Earth Engine · GPS Handheld</h4>
               </div>
             </li>
             <li class="tl-item">
               <div class="tl-dot"><svg viewBox="0 0 24 24"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg></div>
               <div class="tl-body">
                 <span class="tl-period">Web &amp; Visualisasi</span>
-                <h4>HTML5 · CSS3 · JavaScript ES6+ · Node.js · Leaflet.js · Chart.js · Git/GitHub</h4>
+                <h4>JavaScript ES6+ · Node.js · Leaflet.js · Chart.js · Git</h4>
               </div>
             </li>
             <li class="tl-item">
               <div class="tl-dot"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg></div>
               <div class="tl-body">
                 <span class="tl-period">Data &amp; Subsurface</span>
-                <h4>Python · SQL · AutoCAD · Excel · Petrel · Kingdom</h4>
+                <h4>Python · SQL · AutoCAD · Petrel · Kingdom</h4>
               </div>
             </li>
 
@@ -1067,18 +1145,20 @@ body { padding-top: 64px; }
               <div class="tl-dot"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11"/></svg></div>
               <div class="tl-body">
                 <span class="tl-period">Bahasa Inggris</span>
-                <h4>British Council EnglishScore C1 Advanced (2025) · EFSET C2 Proficient 72/100 (2022)</h4>
+                <h4>EnglishScore C1 (2025) · EFSET C2 72/100 (2022)</h4>
               </div>
             </li>
             <li class="tl-item">
               <div class="tl-dot"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11"/></svg></div>
               <div class="tl-body">
-                <span class="tl-period">Pengembangan Web · Dicoding (2023)</span>
-                <h4>Front-End · Back-End dengan JavaScript · Pengembangan Web Tingkat Menengah</h4>
+                <span class="tl-period">Dicoding (2023)</span>
+                <h4>Front-End &amp; Back-End Web Development</h4>
               </div>
             </li>
 
           </ul>
+          </div>
+          </div>
         </div>
 
       </div>
