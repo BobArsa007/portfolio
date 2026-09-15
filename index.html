@@ -83,14 +83,22 @@ body { padding-top: 64px; }
   color: var(--ink);
   white-space: nowrap;
   text-decoration: none;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0;
 }
 .top-nav-mark em { font-style: italic; font-weight: 400; opacity: 0.55; }
 
 .top-nav-tabs {
   display: flex;
   align-items: center;
-  gap: clamp(14px, 2.4vw, 30px);
+  gap: clamp(12px, 2vw, 28px);
+  max-width: 100%;
+  overflow-x: auto;
+  scrollbar-width: none;
 }
+.top-nav-tabs::-webkit-scrollbar { display: none; }
 .top-nav-tab {
   font-family: var(--mono);
   font-size: 12px;
@@ -102,6 +110,8 @@ body { padding-top: 64px; }
   background: transparent;
   padding: 4px 0;
   position: relative;
+  white-space: nowrap;
+  flex-shrink: 0;
   transition: color 0.15s;
 }
 .top-nav-tab::after {
@@ -133,6 +143,8 @@ body { padding-top: 64px; }
 
 @media (max-width: 720px) {
   .top-nav-cv { display: none; }
+  .top-nav { padding: 0 16px; gap: 14px; }
+  .top-nav-mark { font-size: 14px; }
 }
 
 /* ══ HERO ══ */
@@ -171,13 +183,21 @@ body { padding-top: 64px; }
 
 .hero-name {
   font-family: var(--serif);
-  font-size: clamp(46px, 6.6vw, 96px);
+  font-size: clamp(24px, 5.4vw, 88px);
   font-weight: 500;
-  line-height: 0.98;
+  line-height: 1;
   letter-spacing: -0.02em;
   color: var(--ink);
+  white-space: nowrap;
 }
 .hero-name .last { font-style: italic; font-weight: 400; }
+
+@media (max-width: 400px) {
+  .hero-name { font-size: 6.6vw; }
+}
+@media (max-width: 340px) {
+  .hero-name { font-size: 6vw; letter-spacing: -0.03em; }
+}
 
 .hero-roles {
   font-family: var(--mono);
@@ -248,14 +268,65 @@ body { padding-top: 64px; }
   .hero-left { padding: 6vh var(--gutter); }
 }
 
-/* ══ SECTION TAB PANELS ══ */
-#sections { display: block; }
+/* ══ PAGE-FLIP SYSTEM ══ */
+/* Each top-level view (hero + 4 sections) is a "page". Only one page
+   is laid out at a time; switching plays a slide+fade transition so
+   the site feels like turning a leaf rather than a scroll jump. */
+#pageport {
+  position: relative;
+  min-height: calc(100vh - 64px);
+  overflow: hidden;
+}
+.page {
+  display: none;
+  background: var(--paper);
+  width: 100%;
+}
+.page.current { display: block; position: relative; }
 
-/* section content wrapper, hidden unless active */
-.sec-content { display: none; background: var(--paper); }
-.sec-content.open { display: block; animation: fadeIn 0.25s ease; }
+/* while animating, both outgoing + incoming pages are stacked absolutely
+   so they overlap instead of pushing layout during the transition */
+.page.anim-out-left, .page.anim-out-right,
+.page.anim-in-left, .page.anim-in-right {
+  display: block;
+  position: absolute;
+  top: 0; left: 0;
+}
 
-@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+.page.anim-out-left  { animation: pageOutLeft  0.42s cubic-bezier(.4,0,.2,1) forwards; }
+.page.anim-out-right { animation: pageOutRight 0.42s cubic-bezier(.4,0,.2,1) forwards; }
+.page.anim-in-left   { animation: pageInLeft   0.46s cubic-bezier(.16,1,.3,1) forwards; }
+.page.anim-in-right  { animation: pageInRight  0.46s cubic-bezier(.16,1,.3,1) forwards; }
+
+@keyframes pageOutLeft  { from { opacity:1; transform:translateX(0);    } to { opacity:0; transform:translateX(-3.5%); } }
+@keyframes pageOutRight { from { opacity:1; transform:translateX(0);    } to { opacity:0; transform:translateX(3.5%);  } }
+@keyframes pageInLeft   { from { opacity:0; transform:translateX(4.5%); } to { opacity:1; transform:translateX(0);    } }
+@keyframes pageInRight  { from { opacity:0; transform:translateX(-4.5%);} to { opacity:1; transform:translateX(0);    } }
+
+@media (prefers-reduced-motion: reduce) {
+  .page.anim-out-left, .page.anim-out-right, .page.anim-in-left, .page.anim-in-right {
+    animation-duration: 0.001ms !important;
+  }
+}
+
+/* page corner index — quiet reference to the "flipping pages" concept */
+.page-index {
+  position: fixed;
+  right: clamp(14px, 2.2vw, 28px);
+  bottom: 20px;
+  z-index: 900;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--ink-25);
+  letter-spacing: 0.02em;
+  pointer-events: none;
+}
+.page-index span.cur { color: var(--ink-40); }
+
+@media (max-width: 720px) { .page-index { display: none; } }
 
 /* ══ ABOUT ══ */
 .about-inner {
@@ -287,9 +358,9 @@ body { padding-top: 64px; }
 
 .about-name {
   font-family: var(--serif);
-  font-size: clamp(1.9rem, 2.6vw, 2.4rem);
+  font-size: clamp(1.7rem, 2.3vw, 2.15rem);
   font-weight: 500;
-  line-height: 1.04;
+  line-height: 1.08;
   letter-spacing: -0.01em;
   margin-bottom: 14px;
 }
@@ -773,8 +844,9 @@ footer {
 
 <!-- ═══ TOP NAV ═══ -->
 <nav class="top-nav" id="topNav">
-  <a href="#top" class="top-nav-mark">Bobby <em>Arsanto Putro</em></a>
+  <button class="top-nav-mark" onclick="navTab('beranda')">Bobby <em>Arsanto Putro</em></button>
   <div class="top-nav-tabs">
+    <button class="top-nav-tab" id="tab-beranda"  onclick="navTab('beranda')">Beranda</button>
     <button class="top-nav-tab" id="tab-proyek"   onclick="navTab('proyek')">Proyek</button>
     <button class="top-nav-tab" id="tab-tentang"  onclick="navTab('tentang')">Tentang</button>
     <button class="top-nav-tab" id="tab-keahlian" onclick="navTab('keahlian')">Keahlian</button>
@@ -784,12 +856,17 @@ footer {
 </nav>
 
 <!-- ═══ HERO ═══ -->
-<section class="hero" id="top">
+<!-- ═══ PAGES ═══ -->
+<div id="pageport">
+
+  <!-- BERANDA (hero) -->
+  <div class="page current" id="page-beranda">
+  <section class="hero" id="top">
   <div class="hero-left">
     <div class="hero-eyebrow"><span class="dot"></span>Terbuka untuk peluang baru</div>
 
     <div>
-      <div class="hero-name">Bobby Arsanto<br><span class="last">Putro</span></div>
+      <div class="hero-name">Bobby Arsanto <span class="last">Putro</span></div>
     </div>
 
     <div class="hero-roles">Surveyor<span class="sep">/</span>GIS Analyst<span class="sep">/</span>Spatial Developer</div>
@@ -805,13 +882,11 @@ footer {
     <div class="hero-photo-frame"></div>
     <div class="hero-photo-tag">FIELD SURVEY, JAWA TENGAH</div>
   </div>
-</section>
-
-<!-- ═══ SECTIONS ═══ -->
-<div id="sections">
+  </section>
+  </div><!-- /page-beranda -->
 
   <!-- PROYEK -->
-  <div class="sec-content" id="content-proyek">
+  <div class="page" id="page-proyek">
     <section id="proyek">
       <div class="proyek-header">
         <span class="proyek-h-text">Proyek</span>
@@ -934,7 +1009,7 @@ footer {
   </div>
 
   <!-- TENTANG -->
-  <div class="sec-content" id="content-tentang">
+  <div class="page" id="page-tentang">
     <section id="tentang">
       <div class="about-inner">
 
@@ -942,7 +1017,7 @@ footer {
         <div class="about-left-col">
           <div class="about-left-top">
             <div class="about-eyebrow">GIS Analyst &amp; Spatial Developer</div>
-            <div class="about-name">Bobby<br>Arsanto<br>Putro</div>
+            <div class="about-name">Bobby Arsanto<br>Putro</div>
             <div class="about-role">Surveyor · Analis GIS · Pengembang Web Spasial<br>Berbasis di Semarang, Indonesia</div>
             <div class="about-stats">
               <div class="about-stat">
@@ -1068,7 +1143,7 @@ footer {
   </div>
 
   <!-- KEAHLIAN -->
-  <div class="sec-content" id="content-keahlian">
+  <div class="page" id="page-keahlian">
     <section id="keahlian">
       <div class="keahlian-inner">
         <div class="keahlian-title">Keahlian &amp; Alat</div>
@@ -1139,7 +1214,7 @@ footer {
   </div>
 
   <!-- KONTAK -->
-  <div class="sec-content" id="content-kontak">
+  <div class="page" id="page-kontak">
     <section id="kontak">
       <div class="kontak-inner">
         <div class="kontak-left">
@@ -1179,7 +1254,11 @@ footer {
     </section>
   </div>
 
-</div><!-- /sections -->
+</div><!-- /pageport -->
+
+<div class="page-index" id="pageIndex" aria-hidden="true">
+  <span class="cur" id="pageIndexCur">01</span><span>/ 05</span>
+</div>
 
 <!-- ═══ FOOTER ═══ -->
 <footer>
@@ -1228,29 +1307,59 @@ footer {
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
 
-// ── Top-nav tab panels ──
-const SECTION_IDS = ['proyek', 'tentang', 'keahlian', 'kontak'];
+// ── Page-flip navigation ──
+const PAGE_IDS = ['beranda', 'proyek', 'tentang', 'keahlian', 'kontak'];
+let currentPage = 'beranda';
+let isFlipping = false;
 
-function showSection(id) {
-  SECTION_IDS.forEach(sid => {
-    const panel = document.getElementById('content-' + sid);
-    const tab = document.getElementById('tab-' + sid);
-    const isActive = sid === id;
-    if (panel) panel.classList.toggle('open', isActive);
-    if (tab) tab.classList.toggle('active', isActive);
+function setActiveTab(id) {
+  PAGE_IDS.forEach(pid => {
+    const tab = document.getElementById('tab-' + pid);
+    if (tab) tab.classList.toggle('active', pid === id);
   });
+  const idxEl = document.getElementById('pageIndexCur');
+  if (idxEl) idxEl.textContent = String(PAGE_IDS.indexOf(id) + 1).padStart(2, '0');
 }
 
 function navTab(id) {
-  showSection(id);
-  const el = document.getElementById('sections');
-  if (el && typeof el.scrollIntoView === 'function') {
-    try { el.scrollIntoView({ behavior: 'smooth', block: 'start' }); } catch (e) {}
-  }
+  if (id === currentPage || isFlipping) return;
+  if (PAGE_IDS.indexOf(id) === -1) return;
+
+  const fromEl = document.getElementById('page-' + currentPage);
+  const toEl = document.getElementById('page-' + id);
+  if (!fromEl || !toEl) return;
+
+  const fromIdx = PAGE_IDS.indexOf(currentPage);
+  const toIdx = PAGE_IDS.indexOf(id);
+  const forward = toIdx > fromIdx; // moving right through the "book"
+
+  isFlipping = true;
+  setActiveTab(id);
+
+  // scroll to top of the page port so the new page is fully visible
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+
+  fromEl.classList.remove('current');
+  toEl.classList.add('current');
+
+  fromEl.classList.add(forward ? 'anim-out-left' : 'anim-out-right');
+  toEl.classList.add(forward ? 'anim-in-right' : 'anim-in-left');
+
+  const cleanup = () => {
+    fromEl.classList.remove('anim-out-left', 'anim-out-right');
+    toEl.classList.remove('anim-in-left', 'anim-in-right');
+    currentPage = id;
+    isFlipping = false;
+  };
+
+  // fallback timer in case animationend doesn't fire (e.g. display:none race)
+  let done = false;
+  const onEnd = () => { if (done) return; done = true; cleanup(); };
+  toEl.addEventListener('animationend', onEnd, { once: true });
+  setTimeout(onEnd, 520);
 }
 
-// nothing shown until a tab is clicked
-showSection(null);
+setActiveTab('beranda');
 
 // ── PDF Modal ──
 function openPDF(file, title) {
