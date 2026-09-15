@@ -75,21 +75,6 @@ a:focus-visible, button:focus-visible, input:focus-visible {
 }
 body { padding-top: 64px; }
 
-.top-nav-mark {
-  font-family: var(--serif);
-  font-size: 16px;
-  font-weight: 500;
-  letter-spacing: -0.01em;
-  color: var(--ink);
-  white-space: nowrap;
-  text-decoration: none;
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  padding: 0;
-}
-.top-nav-mark em { font-style: italic; font-weight: 400; opacity: 0.55; }
-
 .top-nav-tabs {
   display: flex;
   align-items: center;
@@ -144,7 +129,6 @@ body { padding-top: 64px; }
 @media (max-width: 720px) {
   .top-nav-cv { display: none; }
   .top-nav { padding: 0 16px; gap: 14px; }
-  .top-nav-mark { font-size: 14px; }
 }
 
 /* ══ HERO ══ */
@@ -350,6 +334,8 @@ body { padding-top: 64px; }
 
 .about-stats {
   display: inline-grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 1fr;
   border: 1px solid var(--line);
   margin-bottom: 30px;
 }
@@ -358,7 +344,9 @@ body { padding-top: 64px; }
   display: flex;
   flex-direction: column;
   gap: 3px;
+  border-left: 1px solid var(--line);
 }
+.about-stat:first-child { border-left: none; }
 .about-stat-num {
   font-family: var(--serif);
   font-size: 21px;
@@ -418,7 +406,22 @@ body { padding-top: 64px; }
 .about-bio:last-child { margin-bottom: 0; }
 
 .tl-list { list-style: none; }
-.tl-list li.tl-head { margin-top: 34px; margin-bottom: 4px; padding-top: 20px; border-top: 1px solid var(--line); }
+.tl-list li.tl-head {
+  margin-top: 34px;
+  margin-bottom: 4px;
+  padding-top: 20px;
+  border-top: 1px solid var(--line);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.tl-list li.tl-head::before {
+  content: '';
+  width: 14px;
+  height: 1px;
+  background: var(--ink-25);
+  flex-shrink: 0;
+}
 .tl-list li.tl-head:first-child { margin-top: 0; padding-top: 0; border-top: none; }
 
 .tl-item {
@@ -426,8 +429,10 @@ body { padding-top: 64px; }
   gap: 16px;
   padding: 18px 0;
   border-bottom: 1px solid var(--line);
+  transition: padding-left 0.18s ease;
 }
 .tl-item:last-child { border-bottom: none; }
+.tl-item:hover { padding-left: 6px; }
 .tl-dot {
   width: 28px; height: 28px;
   border: 1px solid var(--ink-12);
@@ -786,15 +791,14 @@ body { padding-top: 64px; }
 
 <!-- ═══ TOP NAV ═══ -->
 <nav class="top-nav" id="topNav">
-  <button class="top-nav-mark" onclick="navTab('beranda')">Bobby <em>Arsanto Putro</em></button>
   <div class="top-nav-tabs">
     <button class="top-nav-tab" id="tab-beranda"  onclick="navTab('beranda')">Beranda</button>
     <button class="top-nav-tab" id="tab-proyek"   onclick="navTab('proyek')">Proyek</button>
     <button class="top-nav-tab" id="tab-tentang"  onclick="navTab('tentang')">Tentang</button>
     <button class="top-nav-tab" id="tab-keahlian" onclick="navTab('keahlian')">Keahlian</button>
     <button class="top-nav-tab" id="tab-kontak"   onclick="navTab('kontak')">Kontak</button>
-    <a href="CV_Bobby_Arsanto_Putro_EN.pdf" download class="top-nav-cv">↓ CV</a>
   </div>
+  <a href="CV_Bobby_Arsanto_Putro_EN.pdf" download class="top-nav-cv">↓ CV</a>
 </nav>
 
 <!-- ═══ HERO ═══ -->
@@ -960,6 +964,10 @@ body { padding-top: 64px; }
                 <span class="about-stat-num">3,50</span>
                 <span class="about-stat-lbl">IPK S1</span>
               </div>
+              <div class="about-stat">
+                <span class="about-stat-num">5+</span>
+                <span class="about-stat-lbl">PROYEK SPASIAL</span>
+              </div>
             </div>
           </div>
           <div class="about-left-bottom">
@@ -989,8 +997,8 @@ body { padding-top: 64px; }
 
           <div class="about-bio-block">
             <div class="tl-head">Tentang Saya</div>
-            <p class="about-bio">Lulusan S1 Geografi UNNES dengan spesialisasi SIG, penginderaan jauh, dan analisis geospasial pesisir. Berpengalaman dalam pengolahan citra satelit, pemetaan ekosistem pesisir, survei infrastruktur, dan visualisasi data spasial berbasis web.</p>
-            <p class="about-bio">Menguasai ArcGIS, QGIS, dan Google Earth Engine. Memiliki pemahaman pada perangkat subsurface termasuk Petrel dan Kingdom, serta pengembangan web fullstack dengan HTML5, CSS3, JavaScript, dan Node.js.</p>
+            <p class="about-bio">Lulusan S1 Geografi UNNES dengan spesialisasi Sistem Informasi Geografis (SIG) dan penginderaan jauh. Berpengalaman dalam pengolahan citra satelit, pemetaan tematik, survei infrastruktur lapangan, serta pengembangan aplikasi dan visualisasi data spasial berbasis web.</p>
+            <p class="about-bio">Menguasai ArcGIS, QGIS, dan Google Earth Engine untuk berbagai kebutuhan analisis spasial — mulai dari pemetaan lingkungan, perencanaan tata ruang, hingga inventarisasi aset. Memiliki pemahaman pada perangkat subsurface termasuk Petrel dan Kingdom, serta pengembangan web fullstack dengan HTML5, CSS3, JavaScript, dan Node.js.</p>
           </div>
 
           <ul class="tl-list">
@@ -1001,7 +1009,7 @@ body { padding-top: 64px; }
               <div class="tl-body">
                 <span class="tl-period">Ags 2019 – Okt 2025</span>
                 <h4>S1 Geografi, IPK 3,50 — Universitas Negeri Semarang (UNNES)</h4>
-                <p>Spesialisasi penginderaan jauh, pemetaan pesisir, analisis SIG, dan pengembangan aplikasi geospasial.</p>
+                <p>Spesialisasi penginderaan jauh, analisis SIG, pemetaan tematik, dan pengembangan aplikasi geospasial.</p>
               </div>
             </li>
 
