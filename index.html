@@ -196,19 +196,26 @@ body { padding-top: 64px; }
 
 .hero-right {
   position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   overflow: hidden;
   background: var(--paper-off);
   border-left: 1px solid var(--line);
+  padding: 48px;
 }
 .hero-photo {
-  position: absolute;
-  inset: 0;
+  position: relative;
+  width: 100%;
+  max-width: 300px;
+  aspect-ratio: 4 / 5;
+  margin: 0 auto;
 }
 .hero-photo img {
   width: 100%;
   height: 100%;
-  object-fit: cover;
-  object-position: center top;
+  object-fit: contain;
+  object-position: center;
 }
 .hero-photo-fallback {
   position: absolute; inset: 0;
@@ -220,105 +227,35 @@ body { padding-top: 64px; }
 }
 .hero-photo-frame {
   position: absolute;
-  inset: 20px;
-  border: 1px solid rgba(255,255,255,0.35);
+  inset: 12px;
+  border: 1px solid var(--ink-12);
   pointer-events: none;
-  mix-blend-mode: difference;
 }
 .hero-photo-tag {
   position: absolute;
-  left: 20px; bottom: 20px;
+  left: 0; bottom: -28px;
   font-family: var(--mono);
   font-size: 10px;
   letter-spacing: 0.06em;
-  color: rgba(255,255,255,0.85);
-  mix-blend-mode: difference;
+  color: var(--ink-40);
+  white-space: nowrap;
 }
 
 @media (max-width: 860px) {
   .hero { grid-template-columns: 1fr; min-height: auto; }
-  .hero-right { height: 46vh; border-left: none; border-top: 1px solid var(--line); order: -1; }
+  .hero-right { height: auto; padding: 40px 32px 56px; border-left: none; border-top: 1px solid var(--line); order: -1; }
+  .hero-photo { max-width: 220px; }
   .hero-left { padding: 6vh var(--gutter); }
 }
 
-/* ══ STATS STRIP ══ */
-.stats-bar {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  border-bottom: 1px solid var(--line);
-}
-.stat-item {
-  padding: 28px var(--gutter);
-  border-right: 1px solid var(--line);
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-.stat-item:last-child { border-right: none; }
-.stat-num {
-  font-family: var(--serif);
-  font-size: clamp(24px, 2.6vw, 34px);
-  font-weight: 500;
-  letter-spacing: -0.01em;
-}
-.stat-lbl {
-  font-family: var(--mono);
-  font-size: 10.5px;
-  color: var(--ink-40);
-  letter-spacing: 0.03em;
-}
-/* ══ ACCORDION SECTION HEADERS ══ */
-.sec-nav { display: flex; flex-direction: column; }
+/* ══ SECTION TAB PANELS ══ */
+#sections { display: block; }
 
-.sec-link {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  padding: 18px var(--gutter);
-  border-bottom: 1px solid var(--line);
-  cursor: pointer;
-  transition: background 0.15s;
-}
-.sec-link:hover { background: var(--paper-off); }
-.sec-link.is-open { background: var(--paper-off); }
+/* section content wrapper, hidden unless active */
+.sec-content { display: none; background: var(--paper); }
+.sec-content.open { display: block; animation: fadeIn 0.25s ease; }
 
-.sec-index {
-  font-family: var(--mono);
-  font-size: 11px;
-  color: var(--ink-25);
-  flex-shrink: 0;
-  width: 18px;
-}
-.sec-text {
-  font-family: var(--mono);
-  font-size: 13px;
-  font-weight: 500;
-  letter-spacing: 0.02em;
-  color: var(--ink);
-  flex: 1;
-}
-.sec-toggle {
-  font-family: var(--mono);
-  font-size: 15px;
-  color: var(--ink-40);
-  flex-shrink: 0;
-  transition: transform 0.25s ease;
-  line-height: 1;
-}
-.sec-link.is-open .sec-toggle { transform: rotate(45deg); }
-
-.sec-close {
-  display: none;
-}
-
-/* section content wrapper, collapsed by default */
-.sec-content {
-  max-height: 0;
-  overflow: hidden;
-  transition: max-height 0.35s ease;
-  background: var(--paper);
-}
-.sec-content.open { max-height: none; overflow: visible; }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
 /* ══ ABOUT ══ */
 .about-inner {
@@ -366,19 +303,16 @@ body { padding-top: 64px; }
 }
 
 .about-stats {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  display: inline-grid;
   border: 1px solid var(--line);
   margin-bottom: 30px;
 }
 .about-stat {
-  padding: 14px 12px;
-  border-right: 1px solid var(--line);
+  padding: 14px 20px;
   display: flex;
   flex-direction: column;
   gap: 3px;
 }
-.about-stat:last-child { border-right: none; }
 .about-stat-num {
   font-family: var(--serif);
   font-size: 21px;
@@ -841,8 +775,8 @@ footer {
 <nav class="top-nav" id="topNav">
   <a href="#top" class="top-nav-mark">Bobby <em>Arsanto Putro</em></a>
   <div class="top-nav-tabs">
-    <button class="top-nav-tab" id="tab-tentang"  onclick="navTab('tentang')">Tentang</button>
     <button class="top-nav-tab" id="tab-proyek"   onclick="navTab('proyek')">Proyek</button>
+    <button class="top-nav-tab" id="tab-tentang"  onclick="navTab('tentang')">Tentang</button>
     <button class="top-nav-tab" id="tab-keahlian" onclick="navTab('keahlian')">Keahlian</button>
     <button class="top-nav-tab" id="tab-kontak"   onclick="navTab('kontak')">Kontak</button>
     <a href="CV_Bobby_Arsanto_Putro_EN.pdf" download class="top-nav-cv">↓ CV</a>
@@ -873,174 +807,10 @@ footer {
   </div>
 </section>
 
-<!-- ═══ STATS ═══ -->
-<div class="stats-bar">
-  <div class="stat-item">
-    <span class="stat-num">5</span>
-    <span class="stat-lbl">PROYEK SPASIAL</span>
-  </div>
-  <div class="stat-item">
-    <span class="stat-num">C1</span>
-    <span class="stat-lbl">BAHASA INGGRIS</span>
-  </div>
-</div>
-
-<!-- ═══ SECTION NAV ═══ -->
-<nav class="sec-nav">
-
-  <!-- TENTANG -->
-  <div class="sec-link" id="link-tentang" onclick="toggleSec('tentang')">
-    <span class="sec-index">01</span>
-    <span class="sec-text">Tentang Saya</span>
-    <span class="sec-toggle">+</span>
-  </div>
-  <div class="sec-content" id="content-tentang">
-    <section id="tentang">
-      <div class="about-inner">
-
-        <!-- LEFT: sticky identity panel -->
-        <div class="about-left-col">
-          <div class="about-left-top">
-            <div class="about-eyebrow">GIS Analyst &amp; Spatial Developer</div>
-            <div class="about-name">Bobby<br>Arsanto<br>Putro</div>
-            <div class="about-role">Surveyor · Analis GIS · Pengembang Web Spasial<br>Berbasis di Semarang, Indonesia</div>
-            <div class="about-stats">
-              <div class="about-stat">
-                <span class="about-stat-num">3,50</span>
-                <span class="about-stat-lbl">IPK S1</span>
-              </div>
-              <div class="about-stat">
-                <span class="about-stat-num">5</span>
-                <span class="about-stat-lbl">PROYEK SPASIAL</span>
-              </div>
-              <div class="about-stat">
-                <span class="about-stat-num">C1</span>
-                <span class="about-stat-lbl">BAHASA INGGRIS</span>
-              </div>
-            </div>
-          </div>
-          <div class="about-left-bottom">
-            <div class="about-meta">
-              <div class="about-meta-row">
-                <svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-                <span class="about-meta-text">Semarang Barat, Kota Semarang 50148</span>
-              </div>
-              <div class="about-meta-row">
-                <svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.27h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.83a16 16 0 0 0 5.55 5.55l1.38-1.38a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7a2 2 0 0 1 1.72 2z"/></svg>
-                <span class="about-meta-text">0882-2877-5480</span>
-              </div>
-              <div class="about-meta-row">
-                <svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
-                <span class="about-meta-text">bobbyarsantoputro@gmail.com</span>
-              </div>
-              <div class="about-meta-row">
-                <svg viewBox="0 0 24 24"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
-                <span class="about-meta-text">linkedin.com/in/bobbyarsa</span>
-              </div>
-            </div>
-            <div class="avail-badge">Terbuka untuk peluang baru</div>
-          </div>
-        </div>
-
-        <!-- RIGHT: scrollable content -->
-        <div class="about-right-col">
-
-          <div class="about-bio-block">
-            <div class="tl-head">Tentang Saya</div>
-            <p class="about-bio">Lulusan S1 Geografi UNNES dengan spesialisasi SIG, penginderaan jauh, dan analisis geospasial pesisir. Berpengalaman dalam pengolahan citra satelit, pemetaan ekosistem pesisir, survei infrastruktur, dan visualisasi data spasial berbasis web.</p>
-            <p class="about-bio">Menguasai ArcGIS, QGIS, dan Google Earth Engine. Memiliki pemahaman pada perangkat subsurface termasuk Petrel dan Kingdom, serta pengembangan web fullstack dengan HTML5, CSS3, JavaScript, dan Node.js.</p>
-          </div>
-
-          <ul class="tl-list">
-
-            <li class="tl-head">Pendidikan</li>
-            <li class="tl-item">
-              <div class="tl-dot"><svg viewBox="0 0 24 24"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg></div>
-              <div class="tl-body">
-                <span class="tl-period">Ags 2019 – Okt 2025</span>
-                <h4>S1 Geografi, IPK 3,50 — Universitas Negeri Semarang (UNNES)</h4>
-                <p>Spesialisasi penginderaan jauh, pemetaan pesisir, analisis SIG, dan pengembangan aplikasi geospasial.</p>
-              </div>
-            </li>
-
-            <li class="tl-head">Pengalaman Kerja</li>
-            <li class="tl-item">
-              <div class="tl-dot"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div>
-              <div class="tl-body">
-                <span class="tl-period">Nov 2025 – Mei 2026 · MagangHub Kemnaker Batch 2</span>
-                <h4>Surveyor &amp; Pengembang GIS — Kementerian Kelautan dan Perikanan (KKP)</h4>
-                <p>Pemetaan ekosistem pesisir (mangrove, lamun, terumbu karang) Jawa Tengah via GEE &amp; Sentinel-2/Landsat. Membangun Coastline Change Detector multi-temporal berbasis NDWI/MNDWI, serta dashboard KKPRL interaktif dengan Leaflet.js &amp; Chart.js.</p>
-              </div>
-            </li>
-            <li class="tl-item">
-              <div class="tl-dot"><svg viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg></div>
-              <div class="tl-body">
-                <span class="tl-period">Mar 2025 – Mei 2025</span>
-                <h4>Surveyor — CV Mitra Muda Rekayasa, Semarang</h4>
-                <p>Survei lapangan 200+ titik jalan di Kab. Sukoharjo — penilaian kondisi PJU &amp; marka jalan. Digitasi GPS, produksi peta akhir di QGIS &amp; ArcGIS, validasi akurasi basis data spasial.</p>
-              </div>
-            </li>
-            <li class="tl-item">
-              <div class="tl-dot"><svg viewBox="0 0 24 24"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg></div>
-              <div class="tl-body">
-                <span class="tl-period">Feb 2023 – Jun 2023 · MSIB Dicoding x Kampus Merdeka Batch 4</span>
-                <h4>Peserta Pelatihan Pengembangan Web — Dicoding Indonesia, Bandung</h4>
-                <p>Pengembangan antarmuka responsif (HTML5/CSS3/JS ES6+), RESTful API dengan Node.js &amp; Express.js, dan alur Git/GitHub agile.</p>
-              </div>
-            </li>
-
-            <li class="tl-head">Keahlian</li>
-            <li class="tl-item">
-              <div class="tl-dot"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/></svg></div>
-              <div class="tl-body">
-                <span class="tl-period">SIG &amp; Penginderaan Jauh</span>
-                <h4>ArcGIS · QGIS · Google Earth Engine · Google Earth · GPS Handheld</h4>
-              </div>
-            </li>
-            <li class="tl-item">
-              <div class="tl-dot"><svg viewBox="0 0 24 24"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg></div>
-              <div class="tl-body">
-                <span class="tl-period">Web &amp; Visualisasi</span>
-                <h4>HTML5 · CSS3 · JavaScript ES6+ · Node.js · Leaflet.js · Chart.js · Git/GitHub</h4>
-              </div>
-            </li>
-            <li class="tl-item">
-              <div class="tl-dot"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg></div>
-              <div class="tl-body">
-                <span class="tl-period">Data &amp; Subsurface</span>
-                <h4>Python · SQL · AutoCAD · Excel · Petrel · Kingdom</h4>
-              </div>
-            </li>
-
-            <li class="tl-head">Sertifikasi</li>
-            <li class="tl-item">
-              <div class="tl-dot"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11"/></svg></div>
-              <div class="tl-body">
-                <span class="tl-period">Bahasa Inggris</span>
-                <h4>British Council EnglishScore C1 Advanced (2025) · EFSET C2 Proficient 72/100 (2022)</h4>
-              </div>
-            </li>
-            <li class="tl-item">
-              <div class="tl-dot"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11"/></svg></div>
-              <div class="tl-body">
-                <span class="tl-period">Pengembangan Web · Dicoding (2023)</span>
-                <h4>Front-End · Back-End dengan JavaScript · Pengembangan Web Tingkat Menengah</h4>
-              </div>
-            </li>
-
-          </ul>
-        </div>
-
-      </div>
-    </section>
-  </div>
+<!-- ═══ SECTIONS ═══ -->
+<div id="sections">
 
   <!-- PROYEK -->
-  <div class="sec-link" id="link-proyek" onclick="toggleSec('proyek')">
-    <span class="sec-index">02</span>
-    <span class="sec-text">Proyek GIS</span>
-    <span class="sec-toggle">+</span>
-  </div>
   <div class="sec-content" id="content-proyek">
     <section id="proyek">
       <div class="proyek-header">
@@ -1160,15 +930,144 @@ footer {
         </div>
 
       </div>
+
+  <!-- TENTANG -->
+  <div class="sec-content" id="content-tentang">
+    <section id="tentang">
+      <div class="about-inner">
+
+        <!-- LEFT: sticky identity panel -->
+        <div class="about-left-col">
+          <div class="about-left-top">
+            <div class="about-eyebrow">GIS Analyst &amp; Spatial Developer</div>
+            <div class="about-name">Bobby<br>Arsanto<br>Putro</div>
+            <div class="about-role">Surveyor · Analis GIS · Pengembang Web Spasial<br>Berbasis di Semarang, Indonesia</div>
+            <div class="about-stats">
+              <div class="about-stat">
+                <span class="about-stat-num">3,50</span>
+                <span class="about-stat-lbl">IPK S1</span>
+              </div>
+            </div>
+          </div>
+          <div class="about-left-bottom">
+            <div class="about-meta">
+              <div class="about-meta-row">
+                <svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                <span class="about-meta-text">Semarang Barat, Kota Semarang 50148</span>
+              </div>
+              <div class="about-meta-row">
+                <svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.27h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.83a16 16 0 0 0 5.55 5.55l1.38-1.38a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7a2 2 0 0 1 1.72 2z"/></svg>
+                <span class="about-meta-text">0882-2877-5480</span>
+              </div>
+              <div class="about-meta-row">
+                <svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                <span class="about-meta-text">bobbyarsantoputro@gmail.com</span>
+              </div>
+              <div class="about-meta-row">
+                <svg viewBox="0 0 24 24"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
+                <span class="about-meta-text">linkedin.com/in/bobbyarsa</span>
+              </div>
+            </div>
+            <div class="avail-badge">Terbuka untuk peluang baru</div>
+          </div>
+        </div>
+
+        <!-- RIGHT: scrollable content -->
+        <div class="about-right-col">
+
+          <div class="about-bio-block">
+            <div class="tl-head">Tentang Saya</div>
+            <p class="about-bio">Lulusan S1 Geografi UNNES dengan spesialisasi SIG, penginderaan jauh, dan analisis geospasial pesisir. Berpengalaman dalam pengolahan citra satelit, pemetaan ekosistem pesisir, survei infrastruktur, dan visualisasi data spasial berbasis web.</p>
+            <p class="about-bio">Menguasai ArcGIS, QGIS, dan Google Earth Engine. Memiliki pemahaman pada perangkat subsurface termasuk Petrel dan Kingdom, serta pengembangan web fullstack dengan HTML5, CSS3, JavaScript, dan Node.js.</p>
+          </div>
+
+          <ul class="tl-list">
+
+            <li class="tl-head">Pendidikan</li>
+            <li class="tl-item">
+              <div class="tl-dot"><svg viewBox="0 0 24 24"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg></div>
+              <div class="tl-body">
+                <span class="tl-period">Ags 2019 – Okt 2025</span>
+                <h4>S1 Geografi, IPK 3,50 — Universitas Negeri Semarang (UNNES)</h4>
+                <p>Spesialisasi penginderaan jauh, pemetaan pesisir, analisis SIG, dan pengembangan aplikasi geospasial.</p>
+              </div>
+            </li>
+
+            <li class="tl-head">Pengalaman Kerja</li>
+            <li class="tl-item">
+              <div class="tl-dot"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div>
+              <div class="tl-body">
+                <span class="tl-period">Nov 2025 – Mei 2026 · MagangHub Kemnaker Batch 2</span>
+                <h4>Surveyor &amp; Pengembang GIS — Kementerian Kelautan dan Perikanan (KKP)</h4>
+                <p>Pemetaan ekosistem pesisir (mangrove, lamun, terumbu karang) Jawa Tengah via GEE &amp; Sentinel-2/Landsat. Membangun Coastline Change Detector multi-temporal berbasis NDWI/MNDWI, serta dashboard KKPRL interaktif dengan Leaflet.js &amp; Chart.js.</p>
+              </div>
+            </li>
+            <li class="tl-item">
+              <div class="tl-dot"><svg viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg></div>
+              <div class="tl-body">
+                <span class="tl-period">Mar 2025 – Mei 2025</span>
+                <h4>Surveyor — CV Mitra Muda Rekayasa, Semarang</h4>
+                <p>Survei lapangan 200+ titik jalan di Kab. Sukoharjo — penilaian kondisi PJU &amp; marka jalan. Digitasi GPS, produksi peta akhir di QGIS &amp; ArcGIS, validasi akurasi basis data spasial.</p>
+              </div>
+            </li>
+            <li class="tl-item">
+              <div class="tl-dot"><svg viewBox="0 0 24 24"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg></div>
+              <div class="tl-body">
+                <span class="tl-period">Feb 2023 – Jun 2023 · MSIB Dicoding x Kampus Merdeka Batch 4</span>
+                <h4>Peserta Pelatihan Pengembangan Web — Dicoding Indonesia, Bandung</h4>
+                <p>Pengembangan antarmuka responsif (HTML5/CSS3/JS ES6+), RESTful API dengan Node.js &amp; Express.js, dan alur Git/GitHub agile.</p>
+              </div>
+            </li>
+
+            <li class="tl-head">Keahlian</li>
+            <li class="tl-item">
+              <div class="tl-dot"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/></svg></div>
+              <div class="tl-body">
+                <span class="tl-period">SIG &amp; Penginderaan Jauh</span>
+                <h4>ArcGIS · QGIS · Google Earth Engine · Google Earth · GPS Handheld</h4>
+              </div>
+            </li>
+            <li class="tl-item">
+              <div class="tl-dot"><svg viewBox="0 0 24 24"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg></div>
+              <div class="tl-body">
+                <span class="tl-period">Web &amp; Visualisasi</span>
+                <h4>HTML5 · CSS3 · JavaScript ES6+ · Node.js · Leaflet.js · Chart.js · Git/GitHub</h4>
+              </div>
+            </li>
+            <li class="tl-item">
+              <div class="tl-dot"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg></div>
+              <div class="tl-body">
+                <span class="tl-period">Data &amp; Subsurface</span>
+                <h4>Python · SQL · AutoCAD · Excel · Petrel · Kingdom</h4>
+              </div>
+            </li>
+
+            <li class="tl-head">Sertifikasi</li>
+            <li class="tl-item">
+              <div class="tl-dot"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11"/></svg></div>
+              <div class="tl-body">
+                <span class="tl-period">Bahasa Inggris</span>
+                <h4>British Council EnglishScore C1 Advanced (2025) · EFSET C2 Proficient 72/100 (2022)</h4>
+              </div>
+            </li>
+            <li class="tl-item">
+              <div class="tl-dot"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11"/></svg></div>
+              <div class="tl-body">
+                <span class="tl-period">Pengembangan Web · Dicoding (2023)</span>
+                <h4>Front-End · Back-End dengan JavaScript · Pengembangan Web Tingkat Menengah</h4>
+              </div>
+            </li>
+
+          </ul>
+        </div>
+
+      </div>
+    </section>
+  </div>
     </section>
   </div>
 
   <!-- KEAHLIAN -->
-  <div class="sec-link" id="link-keahlian" onclick="toggleSec('keahlian')">
-    <span class="sec-index">03</span>
-    <span class="sec-text">Keahlian &amp; Alat</span>
-    <span class="sec-toggle">+</span>
-  </div>
   <div class="sec-content" id="content-keahlian">
     <section id="keahlian">
       <div class="keahlian-inner">
@@ -1240,11 +1139,6 @@ footer {
   </div>
 
   <!-- KONTAK -->
-  <div class="sec-link" id="link-kontak" onclick="toggleSec('kontak')">
-    <span class="sec-index">04</span>
-    <span class="sec-text">Kontak</span>
-    <span class="sec-toggle">+</span>
-  </div>
   <div class="sec-content" id="content-kontak">
     <section id="kontak">
       <div class="kontak-inner">
@@ -1285,7 +1179,7 @@ footer {
     </section>
   </div>
 
-</nav><!-- /sec-nav -->
+</div><!-- /sections -->
 
 <!-- ═══ FOOTER ═══ -->
 <footer>
@@ -1334,42 +1228,29 @@ footer {
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
 
-// ── Accordion tabs ──
-function setActiveTab(id) {
-  document.querySelectorAll('.top-nav-tab').forEach(b => b.classList.remove('active'));
-  document.querySelectorAll('.sec-link').forEach(l => l.classList.remove('is-open'));
-  if (id) {
-    const t = document.getElementById('tab-' + id);
-    if (t) t.classList.add('active');
-    const l = document.getElementById('link-' + id);
-    if (l) l.classList.add('is-open');
-  }
-}
+// ── Top-nav tab panels ──
+const SECTION_IDS = ['proyek', 'tentang', 'keahlian', 'kontak'];
 
-function toggleSec(id) {
-  const content = document.getElementById('content-' + id);
-  const isOpen = content.classList.contains('open');
-
-  document.querySelectorAll('.sec-content').forEach(c => c.classList.remove('open'));
-
-  if (!isOpen) {
-    content.classList.add('open');
-    setActiveTab(id);
-    setTimeout(() => document.getElementById('link-' + id).scrollIntoView({ behavior: 'smooth', block: 'start' }), 60);
-  } else {
-    setActiveTab(null);
-  }
+function showSection(id) {
+  SECTION_IDS.forEach(sid => {
+    const panel = document.getElementById('content-' + sid);
+    const tab = document.getElementById('tab-' + sid);
+    const isActive = sid === id;
+    if (panel) panel.classList.toggle('open', isActive);
+    if (tab) tab.classList.toggle('active', isActive);
+  });
 }
 
 function navTab(id) {
-  const content = document.getElementById('content-' + id);
-  const isOpen = content.classList.contains('open');
-  if (isOpen) {
-    document.getElementById('link-' + id).scrollIntoView({ behavior: 'smooth', block: 'start' });
-    return;
+  showSection(id);
+  const el = document.getElementById('sections');
+  if (el && typeof el.scrollIntoView === 'function') {
+    try { el.scrollIntoView({ behavior: 'smooth', block: 'start' }); } catch (e) {}
   }
-  toggleSec(id);
 }
+
+// show the first section by default
+showSection('proyek');
 
 // ── PDF Modal ──
 function openPDF(file, title) {
