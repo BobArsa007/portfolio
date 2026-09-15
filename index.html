@@ -930,6 +930,8 @@ footer {
         </div>
 
       </div>
+    </section>
+  </div>
 
   <!-- TENTANG -->
   <div class="sec-content" id="content-tentang">
@@ -1062,8 +1064,6 @@ footer {
         </div>
 
       </div>
-    </section>
-  </div>
     </section>
   </div>
 
@@ -1249,8 +1249,8 @@ function navTab(id) {
   }
 }
 
-// show the first section by default
-showSection('proyek');
+// nothing shown until a tab is clicked
+showSection(null);
 
 // ── PDF Modal ──
 function openPDF(file, title) {
