@@ -186,7 +186,7 @@ body { padding-top: 64px; }
 .hero-photo {
   position: relative;
   width: 100%;
-  max-width: 300px;
+  max-width: min(420px, 100%);
   aspect-ratio: 4 / 5;
   margin: 0 auto;
 }
@@ -311,7 +311,8 @@ body { padding-top: 64px; }
   gap: clamp(20px, 5vh, 56px);
   border-right: 1px solid var(--line);
   padding: clamp(14px, 2.5vh, 28px) 30px;
-  overflow: hidden;
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 
 .about-eyebrow {
@@ -394,7 +395,8 @@ body { padding-top: 64px; }
 .about-right-col {
   height: 100%;
   padding: clamp(14px, 2.5vh, 28px) clamp(20px, 3vw, 44px);
-  overflow: hidden;
+  overflow-y: auto;
+  overflow-x: hidden;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -528,22 +530,21 @@ body { padding-top: 64px; }
 .pgrid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  grid-auto-rows: 1fr;
+  grid-auto-rows: min-content;
   gap: 1px;
   background: var(--line);
   flex: 1;
   min-height: 0;
-  overflow: hidden;
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 
 .pcard {
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  padding: clamp(12px, 2vh, 22px) clamp(14px, 1.6vw, 24px);
+  gap: 8px;
+  padding: clamp(12px, 1.8vh, 20px) clamp(14px, 1.6vw, 22px);
   background: var(--paper);
-  min-height: 0;
-  overflow: hidden;
 }
 .pcard:hover { background: var(--paper-off); }
 
@@ -556,7 +557,7 @@ body { padding-top: 64px; }
 }
 .pcard-img svg { width: 100%; height: 100%; display: block; }
 
-.pcard-body { min-width: 0; min-height: 0; display: flex; flex-direction: column; overflow: hidden; }
+.pcard-body { min-width: 0; display: flex; flex-direction: column; flex: 1; }
 .pcard-type {
   font-family: var(--mono);
   font-size: 9px;
@@ -569,23 +570,19 @@ body { padding-top: 64px; }
   font-size: clamp(14px, 1.3vw, 17px);
   font-weight: 500;
   letter-spacing: -0.01em;
-  line-height: 1.2;
+  line-height: 1.25;
   margin-bottom: 6px;
 }
 .pcard-desc {
   font-family: var(--mono);
   font-size: 10.5px;
   color: var(--ink-60);
-  line-height: 1.5;
+  line-height: 1.55;
   margin-bottom: 10px;
-  overflow: hidden;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
 }
 
 .pcard-more { background: var(--paper-off); }
-.pcard-more-body { justify-content: center; height: 100%; }
+.pcard-more-body { justify-content: center; }
 .pcard-more .pcard-title { color: var(--ink-60); }
 .pcard-btn {
   display: inline-flex;
@@ -606,17 +603,19 @@ body { padding-top: 64px; }
 .pcard-btn:hover { background: var(--ink); color: var(--paper); }
 
 @media (max-width: 860px) {
-  .pgrid { grid-template-columns: 1fr 1fr; overflow-y: hidden; }
-  .pcard-desc { -webkit-line-clamp: 2; }
+  .pgrid { grid-template-columns: 1fr 1fr; }
 }
 
 @media (max-width: 640px) {
-  .pgrid { grid-template-columns: 1fr 1fr; grid-auto-rows: 1fr; gap: 1px; }
-  .pcard { padding: 8px 10px; gap: 5px; }
+  .pgrid { grid-template-columns: 1fr 1fr; gap: 1px; }
+  .pcard { padding: 10px 12px; gap: 6px; }
   .pcard-img { display: none; }
   .pcard-type { font-size: 7.5px; margin-bottom: 3px; }
-  .pcard-title { font-size: 11.5px; margin-bottom: 3px; line-height: 1.15; }
-  .pcard-desc { -webkit-line-clamp: 2; margin-bottom: 6px; font-size: 9px; line-height: 1.35; }
+  .pcard-title { font-size: 12px; margin-bottom: 3px; line-height: 1.2; }
+  .pcard-desc {
+    margin-bottom: 6px; font-size: 9.5px; line-height: 1.4;
+    overflow: hidden; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical;
+  }
   .pcard-btn { font-size: 9px; padding: 4px 8px; }
   .pcard-more-body { align-items: flex-start; text-align: left; }
 }
@@ -629,7 +628,8 @@ body { padding-top: 64px; }
   display: flex;
   flex-direction: column;
   justify-content: center;
-  overflow: hidden;
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 .keahlian-title {
   font-family: var(--serif);
@@ -677,7 +677,8 @@ body { padding-top: 64px; }
   padding: clamp(16px, 4vh, 40px) var(--gutter);
   height: 100%;
   align-content: center;
-  overflow: hidden;
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 .kontak-h {
   font-family: var(--serif);
@@ -1015,13 +1016,13 @@ body { padding-top: 64px; }
           </div>
         </div>
 
-        <!-- More on GitHub -->
+        <!-- CTA to contact -->
         <div class="pcard pcard-more">
           <div class="pcard-body pcard-more-body">
             <div class="pcard-type">SELENGKAPNYA</div>
-            <div class="pcard-title">Lihat Semua Proyek</div>
-            <div class="pcard-desc">Repositori lengkap &amp; proyek lain ada di GitHub saya.</div>
-            <a href="https://github.com/BobArsa007" target="_blank" rel="noopener" class="pcard-btn">GitHub ↗</a>
+            <div class="pcard-title">Proyek Lainnya</div>
+            <div class="pcard-desc">Ada beberapa proyek lain yang belum ditampilkan di sini. Hubungi saya untuk detail lebih lanjut.</div>
+            <button class="pcard-btn" onclick="navTab('kontak')">Hubungi Saya →</button>
           </div>
         </div>
 
@@ -1242,7 +1243,7 @@ body { padding-top: 64px; }
       <div class="kontak-inner">
         <div class="kontak-left">
           <h2 class="kontak-h">Punya proyek<br>spasial? <em>Hubungi.</em></h2>
-          <p class="kontak-sub">Dari peta lapangan sampai dashboard web — saya handle end-to-end. Terbuka untuk posisi penuh waktu, proyek lepas, maupun kolaborasi teknis. Berbasis di Semarang, terbuka untuk remote.</p>
+          <p class="kontak-sub">Dari survei lapangan hingga dashboard web — saya kerjakan secara menyeluruh, dari awal sampai akhir. Terbuka untuk posisi penuh waktu, proyek lepas, maupun kolaborasi teknis. Berbasis di Semarang, terbuka untuk kerja jarak jauh.</p>
         </div>
         <div class="kontak-right">
           <a href="mailto:bobbyarsantoputro@gmail.com" class="clink">
