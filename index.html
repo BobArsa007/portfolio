@@ -480,25 +480,6 @@ body { padding-top: 64px; }
    clamp rather than a fixed size, and the thumbnail + description are the
    two things trimmed first since they're the tallest, least essential parts. */
 #proyek { height: 100%; display: flex; flex-direction: column; overflow: hidden; }
-.proyek-header {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  padding: clamp(8px, 1.6vh, 16px) var(--gutter) clamp(6px, 1vh, 10px);
-  border-bottom: 1px solid var(--line);
-  flex-shrink: 0;
-}
-.proyek-h-text {
-  font-family: var(--serif);
-  font-size: clamp(16px, 1.8vw, 22px);
-  font-weight: 500;
-}
-.proyek-h-sub {
-  font-family: var(--mono);
-  font-size: 10px;
-  color: var(--ink-40);
-  letter-spacing: 0.03em;
-}
 
 .pgrid {
   display: flex;
@@ -508,6 +489,8 @@ body { padding-top: 64px; }
   flex: 1;
   min-height: 0;
   overflow: hidden;
+  margin-top: clamp(8px, 1.6vh, 16px);
+  border-top: 1px solid var(--line);
 }
 
 .pcard {
@@ -888,10 +871,6 @@ body { padding-top: 64px; }
   <!-- PROYEK -->
   <div class="page" id="page-proyek">
     <section id="proyek">
-      <div class="proyek-header">
-        <span class="proyek-h-text">Proyek</span>
-        <span class="proyek-h-sub">5 KARYA SPASIAL</span>
-      </div>
       <div class="pgrid">
 
         <!-- Pemetaan Ekosistem -->
